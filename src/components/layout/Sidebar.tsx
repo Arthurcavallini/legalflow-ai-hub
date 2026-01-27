@@ -46,19 +46,35 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen bg-sidebar-background border-r border-sidebar-border transition-all duration-300',
+        'fixed left-0 top-0 z-40 h-screen border-r border-sidebar-border transition-all duration-300',
         collapsed ? 'w-20' : 'w-64'
       )}
+      style={{
+        background: 'linear-gradient(180deg, hsl(20 14% 5%) 0%, hsl(20 14% 3%) 100%)',
+      }}
     >
       <div className="flex flex-col h-full">
         {/* Logo */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20">
+            <div 
+              className="flex items-center justify-center w-10 h-10 rounded-xl"
+              style={{
+                background: 'linear-gradient(135deg, hsl(36, 100%, 50%) 0%, hsl(25, 80%, 45%) 100%)',
+                boxShadow: '0 4px 20px -5px hsl(36 100% 50% / 0.4)',
+              }}
+            >
               <Scale className="w-5 h-5 text-primary-foreground" />
             </div>
             {!collapsed && (
-              <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              <span 
+                className="text-xl font-bold"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(36, 100%, 55%) 0%, hsl(25, 80%, 50%) 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
                 LexFlow
               </span>
             )}
@@ -86,14 +102,26 @@ export function Sidebar() {
                   <>
                     <span className="flex-1">{item.label}</span>
                     {item.badge && (
-                      <span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold rounded-full bg-primary text-primary-foreground animate-pulse-glow">
+                      <span 
+                        className="flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold rounded-full animate-glow-pulse"
+                        style={{
+                          background: 'linear-gradient(135deg, hsl(36, 100%, 50%) 0%, hsl(25, 80%, 45%) 100%)',
+                          color: 'hsl(0, 0%, 5%)',
+                        }}
+                      >
                         {item.badge}
                       </span>
                     )}
                   </>
                 )}
                 {collapsed && item.badge && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full bg-primary text-primary-foreground">
+                  <span 
+                    className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full"
+                    style={{
+                      background: 'linear-gradient(135deg, hsl(36, 100%, 50%) 0%, hsl(25, 80%, 45%) 100%)',
+                      color: 'hsl(0, 0%, 5%)',
+                    }}
+                  >
                     {item.badge}
                   </span>
                 )}
