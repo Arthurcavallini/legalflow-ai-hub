@@ -13,7 +13,7 @@ export function MainLayout({ children, title, subtitle }: MainLayoutProps) {
       <Sidebar />
       <div className="pl-64 transition-all duration-300">
         <Header title={title} subtitle={subtitle} />
-        <main className="p-6">{children}</main>
+        <main className="p-6 animate-fade-in">{children}</main>
       </div>
     </div>
   );

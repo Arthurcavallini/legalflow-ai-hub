@@ -14,6 +14,7 @@ import Contracts from "./pages/Contracts";
 import Services from "./pages/Services";
 import CalendarPage from "./pages/Calendar";
 import Settings from "./pages/Settings";
+import Intimacoes from "./pages/Intimacoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/inbox" element={<Inbox />} />
+          <Route path="/intimacoes" element={<Intimacoes />} />
           <Route path="/crm" element={<CRM />} />
           <Route path="/production" element={<Production />} />
           <Route path="/clients" element={<Clients />} />
