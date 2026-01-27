@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Building2,
   Scale,
+  Package,
 } from 'lucide-react';
 
 interface NavItem {
@@ -26,12 +27,13 @@ interface NavItem {
 
 const mainNavItems: NavItem[] = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/' },
-  { label: 'Atendimento', icon: MessageSquare, path: '/inbox', badge: 3 },
+  { label: 'Atendimento', icon: MessageSquare, path: '/inbox', badge: 5 },
   { label: 'CRM', icon: FolderKanban, path: '/crm' },
   { label: 'Produção', icon: FolderKanban, path: '/production' },
   { label: 'Clientes', icon: Users, path: '/clients' },
   { label: 'Financeiro', icon: Wallet, path: '/financial' },
   { label: 'Contratos', icon: FileText, path: '/contracts' },
+  { label: 'Serviços', icon: Package, path: '/services' },
   { label: 'Equipe', icon: UserCog, path: '/team' },
   { label: 'Calendário', icon: Calendar, path: '/calendar' },
 ];
@@ -57,11 +59,11 @@ export function Sidebar() {
         {/* Logo */}
         <div className="flex items-center h-16 px-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-sidebar-primary">
-              <Scale className="w-5 h-5 text-sidebar-primary-foreground" />
+            <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary">
+              <Scale className="w-5 h-5 text-primary-foreground" />
             </div>
             {!collapsed && (
-              <span className="text-lg font-semibold text-sidebar-foreground">
+              <span className="text-lg font-semibold text-sidebar-accent-foreground">
                 LexFlow
               </span>
             )}
@@ -98,14 +100,14 @@ export function Sidebar() {
                   <>
                     <span className="flex-1">{item.label}</span>
                     {item.badge && (
-                      <span className="flex items-center justify-center w-5 h-5 text-xs font-medium rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
+                      <span className="flex items-center justify-center w-5 h-5 text-xs font-medium rounded-full bg-primary text-primary-foreground">
                         {item.badge}
                       </span>
                     )}
                   </>
                 )}
                 {collapsed && item.badge && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-xs font-medium rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-xs font-medium rounded-full bg-primary text-primary-foreground">
                     {item.badge}
                   </span>
                 )}

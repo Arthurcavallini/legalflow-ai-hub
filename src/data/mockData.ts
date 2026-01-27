@@ -1,5 +1,14 @@
 import { Lead, Client, Task, Notification, DashboardMetrics, Process, Payment } from '@/types';
 
+// Team members
+export const mockTeamMembers = [
+  { id: '1', name: 'Dr. Carlos Mendes', role: 'Advogado Sênior', avatar: 'CM', status: 'active' as const, tasksCompleted: 45, tasksPending: 8, tasksOverdue: 1 },
+  { id: '2', name: 'Dra. Patricia Lima', role: 'Advogada', avatar: 'PL', status: 'active' as const, tasksCompleted: 38, tasksPending: 12, tasksOverdue: 2 },
+  { id: '3', name: 'Ana Souza', role: 'Assistente Jurídico', avatar: 'AS', status: 'active' as const, tasksCompleted: 62, tasksPending: 5, tasksOverdue: 0 },
+  { id: '4', name: 'Marcos Silva', role: 'Estagiário', avatar: 'MS', status: 'active' as const, tasksCompleted: 28, tasksPending: 15, tasksOverdue: 3 },
+  { id: '5', name: 'Julia Santos', role: 'Financeiro', avatar: 'JS', status: 'vacation' as const, tasksCompleted: 52, tasksPending: 0, tasksOverdue: 0 },
+];
+
 export const mockLeads: Lead[] = [
   {
     id: '1',
@@ -100,6 +109,20 @@ export const mockLeads: Lead[] = [
     updatedAt: new Date('2024-01-12'),
     notes: 'Contrato assinado - R$ 3.500,00',
   },
+  {
+    id: '7',
+    name: 'Fernanda Costa',
+    phone: '+55 11 93333-5678',
+    source: 'referral',
+    status: 'new',
+    caseType: 'Trabalhista',
+    urgency: 'high',
+    probability: 70,
+    officeId: '1',
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-15'),
+    notes: 'Indicação do Dr. Roberto - caso urgente',
+  },
 ];
 
 export const mockClients: Client[] = [
@@ -135,6 +158,27 @@ export const mockClients: Client[] = [
     officeId: '1',
     createdAt: new Date('2023-12-15'),
     updatedAt: new Date('2024-01-10'),
+  },
+  {
+    id: '4',
+    name: 'Mariana Souza',
+    phone: '+55 11 91111-3456',
+    email: 'mariana.souza@email.com',
+    cpf: '789.123.456-00',
+    address: 'Rua Augusta, 500 - São Paulo/SP',
+    officeId: '1',
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-01-15'),
+  },
+  {
+    id: '5',
+    name: 'Ricardo Oliveira',
+    phone: '+55 11 90000-7890',
+    email: 'ricardo.o@email.com',
+    cpf: '321.654.987-00',
+    officeId: '1',
+    createdAt: new Date('2024-01-14'),
+    updatedAt: new Date('2024-01-15'),
   },
 ];
 
@@ -177,6 +221,19 @@ export const mockProcesses: Process[] = [
     updatedAt: new Date('2024-01-15'),
     deadline: new Date('2024-01-25'),
   },
+  {
+    id: '4',
+    clientId: '4',
+    processNumber: '0003456-78.2024.5.02.0002',
+    type: 'Reclamação Trabalhista',
+    status: 'filing',
+    description: 'Assédio moral e danos',
+    assignedTo: 'Dr. Carlos',
+    officeId: '1',
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-01-15'),
+    deadline: new Date('2024-01-18'),
+  },
 ];
 
 export const mockTasks: Task[] = [
@@ -186,7 +243,7 @@ export const mockTasks: Task[] = [
     description: 'Elaborar petição para reclamação trabalhista - Roberto Almeida',
     processId: '1',
     clientId: '1',
-    assignedTo: 'Dr. Carlos',
+    assignedTo: '1',
     status: 'in_progress',
     priority: 'high',
     dueDate: new Date('2024-01-17'),
@@ -199,7 +256,7 @@ export const mockTasks: Task[] = [
     description: 'Comparecer à audiência - Processo 0005678-90',
     processId: '2',
     clientId: '2',
-    assignedTo: 'Dra. Patricia',
+    assignedTo: '2',
     status: 'pending',
     priority: 'high',
     dueDate: new Date('2024-01-18'),
@@ -212,7 +269,7 @@ export const mockTasks: Task[] = [
     description: 'Solicitar CNIS e PPP ao cliente',
     processId: '3',
     clientId: '3',
-    assignedTo: 'Assistente Ana',
+    assignedTo: '3',
     status: 'pending',
     priority: 'medium',
     dueDate: new Date('2024-01-19'),
@@ -225,7 +282,7 @@ export const mockTasks: Task[] = [
     description: 'Prazo para réplica no processo de divórcio',
     processId: '2',
     clientId: '2',
-    assignedTo: 'Dra. Patricia',
+    assignedTo: '2',
     status: 'overdue',
     priority: 'high',
     dueDate: new Date('2024-01-14'),
@@ -236,12 +293,62 @@ export const mockTasks: Task[] = [
     id: '5',
     title: 'Enviar proposta para lead',
     description: 'Preparar e enviar proposta comercial - Carlos Ferreira',
-    assignedTo: 'Dr. Carlos',
+    assignedTo: '1',
     status: 'pending',
     priority: 'high',
     dueDate: new Date('2024-01-16'),
     officeId: '1',
     createdAt: new Date('2024-01-15'),
+  },
+  {
+    id: '6',
+    title: 'Protocolar recurso',
+    description: 'Protocolar recurso ordinário - Mariana Souza',
+    processId: '4',
+    clientId: '4',
+    assignedTo: '4',
+    status: 'overdue',
+    priority: 'high',
+    dueDate: new Date('2024-01-13'),
+    officeId: '1',
+    createdAt: new Date('2024-01-08'),
+  },
+  {
+    id: '7',
+    title: 'Analisar documentos',
+    description: 'Revisar documentação do cliente Pedro Lima',
+    processId: '3',
+    clientId: '3',
+    assignedTo: '4',
+    status: 'pending',
+    priority: 'medium',
+    dueDate: new Date('2024-01-20'),
+    officeId: '1',
+    createdAt: new Date('2024-01-12'),
+  },
+  {
+    id: '8',
+    title: 'Agendar perícia',
+    description: 'Contatar perito e agendar data',
+    processId: '1',
+    clientId: '1',
+    assignedTo: '3',
+    status: 'pending',
+    priority: 'low',
+    dueDate: new Date('2024-01-22'),
+    officeId: '1',
+    createdAt: new Date('2024-01-14'),
+  },
+  {
+    id: '9',
+    title: 'Revisar contrato',
+    description: 'Revisar minuta de contrato do novo cliente',
+    assignedTo: '1',
+    status: 'overdue',
+    priority: 'medium',
+    dueDate: new Date('2024-01-12'),
+    officeId: '1',
+    createdAt: new Date('2024-01-08'),
   },
 ];
 
@@ -282,6 +389,26 @@ export const mockPayments: Payment[] = [
     amount: 2500,
     status: 'overdue',
     dueDate: new Date('2024-01-05'),
+    officeId: '1',
+  },
+  {
+    id: '5',
+    contractId: '4',
+    clientId: '4',
+    amount: 4000,
+    status: 'paid',
+    dueDate: new Date('2024-01-12'),
+    paidAt: new Date('2024-01-11'),
+    method: 'boleto',
+    officeId: '1',
+  },
+  {
+    id: '6',
+    contractId: '5',
+    clientId: '5',
+    amount: 1500,
+    status: 'pending',
+    dueDate: new Date('2024-01-25'),
     officeId: '1',
   },
 ];
@@ -329,13 +456,89 @@ export const mockNotifications: Notification[] = [
   },
 ];
 
+// Court notifications (intimações)
+export const mockCourtNotifications = [
+  {
+    id: '1',
+    processNumber: '0001234-56.2024.5.02.0001',
+    clientName: 'Roberto Almeida',
+    type: 'Intimação',
+    description: 'Intimação para apresentar documentos em 5 dias',
+    receivedAt: new Date('2024-01-15T09:00:00'),
+    deadline: new Date('2024-01-20'),
+    status: 'pending' as const,
+    assignedTo: '1',
+  },
+  {
+    id: '2',
+    processNumber: '0005678-90.2023.8.26.0100',
+    clientName: 'Fernanda Costa',
+    type: 'Despacho',
+    description: 'Despacho designando audiência de instrução',
+    receivedAt: new Date('2024-01-15T11:30:00'),
+    deadline: new Date('2024-02-15'),
+    status: 'pending' as const,
+    assignedTo: '2',
+  },
+  {
+    id: '3',
+    processNumber: '0009012-34.2024.8.26.0100',
+    clientName: 'Pedro Henrique Lima',
+    type: 'Sentença',
+    description: 'Sentença procedente - aguardando prazo recursal',
+    receivedAt: new Date('2024-01-14T14:00:00'),
+    deadline: new Date('2024-01-29'),
+    status: 'pending' as const,
+    assignedTo: '1',
+  },
+  {
+    id: '4',
+    processNumber: '0003456-78.2024.5.02.0002',
+    clientName: 'Mariana Souza',
+    type: 'Intimação',
+    description: 'Intimação para audiência inicial',
+    receivedAt: new Date('2024-01-13T10:00:00'),
+    deadline: new Date('2024-01-25'),
+    status: 'acknowledged' as const,
+    assignedTo: '1',
+  },
+];
+
+// Services catalog
+export const mockServices = [
+  { id: '1', name: 'Reclamação Trabalhista', category: 'Trabalhista', basePrice: 3500, description: 'Ação trabalhista completa' },
+  { id: '2', name: 'Revisão de Aposentadoria', category: 'Previdenciário', basePrice: 2500, description: 'Revisão de benefício do INSS' },
+  { id: '3', name: 'Divórcio Consensual', category: 'Família', basePrice: 2000, description: 'Divórcio sem litígio' },
+  { id: '4', name: 'Divórcio Litigioso', category: 'Família', basePrice: 5000, description: 'Divórcio com disputa' },
+  { id: '5', name: 'Ação de Alimentos', category: 'Família', basePrice: 1500, description: 'Fixação de pensão alimentícia' },
+  { id: '6', name: 'Defesa do Consumidor', category: 'Consumidor', basePrice: 1000, description: 'Ações contra empresas' },
+];
+
+// Contracts
+export const mockContracts = [
+  { id: '1', clientId: '1', serviceId: '1', status: 'active' as const, value: 3500, createdAt: new Date('2024-01-12'), signedAt: new Date('2024-01-12') },
+  { id: '2', clientId: '2', serviceId: '4', status: 'active' as const, value: 5000, createdAt: new Date('2024-01-01'), signedAt: new Date('2024-01-02') },
+  { id: '3', clientId: '3', serviceId: '2', status: 'active' as const, value: 2500, createdAt: new Date('2023-12-15'), signedAt: new Date('2023-12-16') },
+  { id: '4', clientId: '4', serviceId: '1', status: 'active' as const, value: 4000, createdAt: new Date('2024-01-10'), signedAt: new Date('2024-01-10') },
+  { id: '5', clientId: '5', serviceId: '6', status: 'draft' as const, value: 1500, createdAt: new Date('2024-01-14') },
+];
+
+// Calendar events
+export const mockCalendarEvents = [
+  { id: '1', title: 'Audiência - Fernanda Costa', type: 'hearing', date: new Date('2024-01-18T14:00:00'), clientId: '2', processId: '2' },
+  { id: '2', title: 'Prazo - Petição Roberto', type: 'deadline', date: new Date('2024-01-20T23:59:00'), clientId: '1', processId: '1' },
+  { id: '3', title: 'Reunião com cliente novo', type: 'meeting', date: new Date('2024-01-16T10:00:00') },
+  { id: '4', title: 'Prazo recursal - Pedro Lima', type: 'deadline', date: new Date('2024-01-29T23:59:00'), clientId: '3', processId: '3' },
+  { id: '5', title: 'Audiência inicial - Mariana', type: 'hearing', date: new Date('2024-01-25T09:00:00'), clientId: '4', processId: '4' },
+];
+
 export const mockDashboardMetrics: DashboardMetrics = {
   totalLeads: 24,
   newLeadsToday: 3,
   conversionRate: 32,
   activeClients: 18,
   pendingTasks: 12,
-  overdueTasks: 2,
+  overdueTasks: 3,
   monthlyRevenue: 45500,
   pendingPayments: 11000,
   overduePayments: 2500,
