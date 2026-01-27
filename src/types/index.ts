@@ -47,6 +47,7 @@ export interface Client {
   cpf?: string;
   address?: string;
   officeId: string;
+  status: 'active' | 'inactive';
   createdAt: Date;
   updatedAt: Date;
   leadId?: string;

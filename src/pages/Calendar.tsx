@@ -1,5 +1,5 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import { mockCalendarEvents, mockClients, mockTeamMembers } from '@/data/mockData';
+import { mockCalendarEvents, mockClients } from '@/data/mockData';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -9,7 +9,6 @@ import {
   ChevronRight,
   Calendar as CalendarIcon,
   Clock,
-  MapPin,
   User,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -27,12 +26,10 @@ export default function CalendarPage() {
     const lastDay = new Date(year, month + 1, 0);
     const days = [];
 
-    // Add empty slots for days before the first day of the month
     for (let i = 0; i < firstDay.getDay(); i++) {
       days.push(null);
     }
 
-    // Add all days of the month
     for (let i = 1; i <= lastDay.getDate(); i++) {
       days.push(new Date(year, month, i));
     }
@@ -64,9 +61,9 @@ export default function CalendarPage() {
   const today = new Date();
 
   const eventTypeConfig = {
-    hearing: { label: 'Audiência', color: 'bg-red-500', textColor: 'text-red-700', bgLight: 'bg-red-50' },
-    deadline: { label: 'Prazo', color: 'bg-amber-500', textColor: 'text-amber-700', bgLight: 'bg-amber-50' },
-    meeting: { label: 'Reunião', color: 'bg-blue-500', textColor: 'text-blue-700', bgLight: 'bg-blue-50' },
+    hearing: { label: 'Audiência', color: 'bg-destructive', textColor: 'text-destructive', bgLight: 'bg-destructive/20' },
+    deadline: { label: 'Prazo', color: 'bg-warning', textColor: 'text-warning', bgLight: 'bg-warning/20' },
+    meeting: { label: 'Reunião', color: 'bg-primary', textColor: 'text-primary', bgLight: 'bg-primary/20' },
   };
 
   const upcomingEvents = mockCalendarEvents
@@ -78,19 +75,19 @@ export default function CalendarPage() {
     <MainLayout title="Calendário" subtitle="Compromissos e prazos">
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Calendar */}
-        <div className="lg:col-span-2 bg-card rounded-xl border border-border p-6 animate-fade-in">
+        <div className="lg:col-span-2 metric-card p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl font-bold text-foreground">
               {months[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h2>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" onClick={() => navigateMonth('prev')}>
+              <Button variant="outline" size="icon" onClick={() => navigateMonth('prev')} className="rounded-xl">
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => navigateMonth('next')}>
+              <Button variant="outline" size="icon" onClick={() => navigateMonth('next')} className="rounded-xl">
                 <ChevronRight className="w-4 h-4" />
               </Button>
-              <Button className="ml-2 gap-2 bg-primary hover:bg-primary/90">
+              <Button className="ml-2 gap-2 bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20">
                 <Plus className="w-4 h-4" />
                 Novo Evento
               </Button>
@@ -100,7 +97,7 @@ export default function CalendarPage() {
           {/* Days of week header */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {daysOfWeek.map(day => (
-              <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
+              <div key={day} className="text-center text-sm font-medium text-muted-foreground py-3">
                 {day}
               </div>
             ))}
@@ -116,16 +113,16 @@ export default function CalendarPage() {
                 <div
                   key={index}
                   className={cn(
-                    'min-h-[100px] p-2 rounded-lg border border-transparent transition-colors',
-                    day ? 'hover:border-border cursor-pointer' : '',
-                    isToday && 'bg-primary/5 border-primary/20'
+                    'min-h-[100px] p-2 rounded-xl border border-transparent transition-all',
+                    day ? 'hover:border-primary/30 hover:bg-secondary/50 cursor-pointer' : '',
+                    isToday && 'bg-primary/10 border-primary/30'
                   )}
                 >
                   {day && (
                     <>
                       <p className={cn(
-                        'text-sm font-medium mb-1',
-                        isToday && 'text-primary'
+                        'text-sm font-semibold mb-1',
+                        isToday ? 'text-primary' : 'text-foreground'
                       )}>
                         {day.getDate()}
                       </p>
@@ -136,18 +133,18 @@ export default function CalendarPage() {
                             <div
                               key={event.id}
                               className={cn(
-                                'text-xs px-1.5 py-0.5 rounded truncate',
+                                'text-xs px-2 py-1 rounded-lg truncate font-medium',
                                 config.bgLight,
                                 config.textColor
                               )}
                             >
-                              {event.title.length > 15 ? event.title.slice(0, 15) + '...' : event.title}
+                              {event.title.length > 12 ? event.title.slice(0, 12) + '...' : event.title}
                             </div>
                           );
                         })}
                         {events.length > 2 && (
-                          <p className="text-xs text-muted-foreground text-center">
-                            +{events.length - 2}
+                          <p className="text-xs text-primary font-medium text-center">
+                            +{events.length - 2} mais
                           </p>
                         )}
                       </div>
@@ -161,8 +158,8 @@ export default function CalendarPage() {
 
         {/* Upcoming Events */}
         <div className="space-y-6">
-          <div className="bg-card rounded-xl border border-border p-5 animate-fade-in">
-            <h3 className="font-semibold mb-4">Próximos Eventos</h3>
+          <div className="metric-card p-6">
+            <h3 className="font-bold text-lg text-foreground mb-4">Próximos Eventos</h3>
             <div className="space-y-3">
               {upcomingEvents.map(event => {
                 const config = eventTypeConfig[event.type as keyof typeof eventTypeConfig];
@@ -174,17 +171,17 @@ export default function CalendarPage() {
                 return (
                   <div
                     key={event.id}
-                    className="p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer"
+                    className="p-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer"
                   >
                     <div className="flex items-start gap-3">
-                      <div className={cn('w-1 h-full rounded-full', config.color)} />
+                      <div className={cn('w-1 h-14 rounded-full', config.color)} />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <Badge className={cn('text-xs', config.bgLight, config.textColor)}>
+                          <Badge className={cn('text-xs rounded-lg', config.bgLight, config.textColor)}>
                             {config.label}
                           </Badge>
                         </div>
-                        <p className="font-medium text-sm">{event.title}</p>
+                        <p className="font-semibold text-sm text-foreground">{event.title}</p>
                         {clientName && (
                           <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                             <User className="w-3 h-3" />
@@ -210,13 +207,13 @@ export default function CalendarPage() {
           </div>
 
           {/* Legend */}
-          <div className="bg-card rounded-xl border border-border p-5 animate-fade-in">
-            <h3 className="font-semibold mb-4">Legenda</h3>
-            <div className="space-y-2">
+          <div className="metric-card p-6">
+            <h3 className="font-bold text-foreground mb-4">Legenda</h3>
+            <div className="space-y-3">
               {Object.entries(eventTypeConfig).map(([key, config]) => (
-                <div key={key} className="flex items-center gap-2">
+                <div key={key} className="flex items-center gap-3">
                   <span className={cn('w-3 h-3 rounded-full', config.color)} />
-                  <span className="text-sm">{config.label}</span>
+                  <span className="text-sm text-foreground">{config.label}</span>
                 </div>
               ))}
             </div>
