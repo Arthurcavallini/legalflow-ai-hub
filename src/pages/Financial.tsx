@@ -1,7 +1,6 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { MetricCard } from '@/components/dashboard/MetricCard';
 import { mockPayments, mockClients, mockDashboardMetrics } from '@/data/mockData';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -68,17 +67,19 @@ export default function Financial() {
             change={15}
             changeLabel="vs mês anterior"
             icon={TrendingUp}
-            variant="accent"
+            variant="primary"
           />
           <MetricCard
             title="Recebido"
             value={`R$ ${totalReceived.toLocaleString('pt-BR')}`}
             icon={CheckCircle2}
+            variant="success"
           />
           <MetricCard
             title="A Receber"
             value={`R$ ${totalPending.toLocaleString('pt-BR')}`}
             icon={Wallet}
+            variant="warning"
           />
           <MetricCard
             title="Em Atraso"
@@ -108,7 +109,7 @@ export default function Financial() {
               <Download className="w-4 h-4" />
               Exportar
             </Button>
-            <Button className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground">
+            <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
               <Plus className="w-4 h-4" />
               Nova Cobrança
             </Button>
