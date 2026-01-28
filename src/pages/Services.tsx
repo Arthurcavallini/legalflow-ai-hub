@@ -4,6 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
   Plus,
   Search,
   Filter,
@@ -11,6 +19,7 @@ import {
   Package,
   Edit,
   Trash2,
+  Eye,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -33,8 +42,17 @@ export default function Services() {
     return colors[category] || 'bg-muted text-muted-foreground';
   };
 
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
   return (
-    <MainLayout title="Serviços" subtitle="Catálogo">
+    <MainLayout title="Serviços" subtitle="Catálogo de serviços">
       <div className="space-y-6">
         {/* Summary Cards */}
         <div className="grid gap-4 md:grid-cols-4">
@@ -49,13 +67,13 @@ export default function Services() {
           <div className="metric-card metric-card-primary">
             <span className="text-xs text-muted-foreground uppercase tracking-wide">Preço Médio</span>
             <p className="text-3xl font-bold mt-2 text-primary">
-              R$ {Math.round(mockServices.reduce((sum, s) => sum + s.basePrice, 0) / mockServices.length).toLocaleString('pt-BR')}
+              {formatCurrency(Math.round(mockServices.reduce((sum, s) => sum + s.basePrice, 0) / mockServices.length))}
             </p>
           </div>
           <div className="metric-card">
             <span className="text-xs text-muted-foreground uppercase tracking-wide">Mais Caro</span>
             <p className="text-3xl font-bold mt-2">
-              R$ {Math.max(...mockServices.map(s => s.basePrice)).toLocaleString('pt-BR')}
+              {formatCurrency(Math.max(...mockServices.map(s => s.basePrice)))}
             </p>
           </div>
         </div>
@@ -65,58 +83,79 @@ export default function Services() {
           <div className="flex gap-3">
             <div className="relative flex-1 sm:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input type="search" placeholder="Buscar serviços..." className="pl-9" />
+              <Input type="search" placeholder="Buscar serviços..." className="pl-9 rounded-xl" />
             </div>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" className="rounded-xl">
               <Filter className="w-4 h-4" />
             </Button>
           </div>
-          <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm">
+          <Button className="gap-2 bg-primary hover:bg-primary/90 text-sm rounded-xl shadow-lg shadow-primary/20">
             <Plus className="w-4 h-4" />
             Novo Serviço
           </Button>
         </div>
 
-        {/* Services Grid */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {mockServices.map((service) => (
-            <div key={service.id} className="dashboard-card">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-2 rounded-lg bg-primary/20">
-                  <Package className="w-5 h-5 text-primary" />
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-popover border-border">
-                    <DropdownMenuItem className="gap-2 text-sm">
-                      <Edit className="w-3.5 h-3.5" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="gap-2 text-sm text-destructive">
-                      <Trash2 className="w-3.5 h-3.5" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              <h3 className="font-semibold text-sm mb-1">{service.name}</h3>
-              <p className="text-xs text-muted-foreground mb-4">{service.description}</p>
-
-              <div className="flex items-center justify-between pt-4 border-t border-border">
-                <Badge className={cn('font-normal text-xs', getCategoryColor(service.category))}>
-                  {service.category}
-                </Badge>
-                <p className="text-lg font-bold text-primary">
-                  R$ {service.basePrice.toLocaleString('pt-BR')}
-                </p>
-              </div>
-            </div>
-          ))}
+        {/* Services Table */}
+        <div className="dashboard-card p-0 overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="text-xs">Serviço</TableHead>
+                <TableHead className="text-xs">Descrição</TableHead>
+                <TableHead className="text-xs">Categoria</TableHead>
+                <TableHead className="text-xs text-right">Preço Base</TableHead>
+                <TableHead className="w-[80px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {mockServices.map((service) => (
+                <TableRow key={service.id} className="hover:bg-secondary/30 cursor-pointer">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/20">
+                        <Package className="w-4 h-4 text-primary" />
+                      </div>
+                      <span className="font-medium text-sm">{service.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
+                    {service.description}
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={cn('font-normal text-xs', getCategoryColor(service.category))}>
+                      {service.category}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <span className="font-bold text-primary">{formatCurrency(service.basePrice)}</span>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-popover border-border">
+                        <DropdownMenuItem className="gap-2 text-sm">
+                          <Eye className="w-3.5 h-3.5" />
+                          Visualizar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2 text-sm">
+                          <Edit className="w-3.5 h-3.5" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2 text-sm text-destructive">
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
     </MainLayout>

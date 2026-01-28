@@ -4,51 +4,41 @@ import {
   AlertTriangle, 
   Gavel, 
   TrendingUp,
+  TrendingDown,
   DollarSign,
   ArrowUpRight,
   ArrowDownRight,
   Clock,
   CheckCircle2,
-  FileText,
+  MessageSquare,
   Target,
-  BarChart3,
 } from 'lucide-react';
-import { mockDashboardMetrics, mockTasks, mockLeads, mockCourtNotifications, mockClients, mockTeamMembers, mockPayments } from '@/data/mockData';
+import { mockDashboardMetrics, mockTasks, mockCourtNotifications, mockClients, mockTeamMembers, mockPayments } from '@/data/mockData';
 import { cn } from '@/lib/utils';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
-const revenueData = [
-  { month: 'Jan', value: 45000 },
-  { month: 'Fev', value: 52000 },
-  { month: 'Mar', value: 48000 },
-  { month: 'Abr', value: 61000 },
-  { month: 'Mai', value: 55000 },
-  { month: 'Jun', value: 67000 },
-  { month: 'Jul', value: 72000 },
-];
-
-const leadsData = [
-  { name: 'Seg', leads: 12, converted: 8 },
-  { name: 'Ter', leads: 19, converted: 14 },
-  { name: 'Qua', leads: 15, converted: 10 },
-  { name: 'Qui', leads: 22, converted: 16 },
-  { name: 'Sex', leads: 18, converted: 12 },
-  { name: 'Sáb', leads: 8, converted: 5 },
-  { name: 'Dom', leads: 4, converted: 2 },
+const revenueVsExpensesData = [
+  { month: 'Jan', receita: 45000, despesa: 28000 },
+  { month: 'Fev', receita: 52000, despesa: 31000 },
+  { month: 'Mar', receita: 48000, despesa: 29000 },
+  { month: 'Abr', receita: 61000, despesa: 35000 },
+  { month: 'Mai', receita: 55000, despesa: 32000 },
+  { month: 'Jun', receita: 67000, despesa: 38000 },
+  { month: 'Jul', receita: 72000, despesa: 40000 },
 ];
 
 export default function Dashboard() {
   const overdueTasks = mockTasks.filter(t => t.status === 'overdue');
   const pendingNotifications = mockCourtNotifications.filter(n => n.status === 'pending');
-  const completedTasks = mockTasks.filter(t => t.status === 'completed');
   
-  const totalReceived = mockPayments
-    .filter(p => p.status === 'paid')
-    .reduce((sum, p) => sum + p.amount, 0);
-  
-  const totalPending = mockPayments
-    .filter(p => p.status === 'pending')
-    .reduce((sum, p) => sum + p.amount, 0);
+  // Mock data for closed clients this month
+  const closedClientsThisMonth = 12;
+  const closedClientsLastMonth = 9;
+  const clientsPercentageChange = ((closedClientsThisMonth - closedClientsLastMonth) / closedClientsLastMonth * 100).toFixed(0);
+
+  // Mock chats needing attention
+  const chatsNeedingAttention = 5;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -59,176 +49,310 @@ export default function Dashboard() {
     }).format(value);
   };
 
+  // Team performance data
+  const teamPerformance = mockTeamMembers.filter(m => m.status === 'active').map(member => ({
+    ...member,
+    assignedTasks: member.tasksPending + member.tasksCompleted,
+    completedTasks: member.tasksCompleted,
+    completionRate: Math.round((member.tasksCompleted / (member.tasksPending + member.tasksCompleted)) * 100) || 0
+  }));
+
   return (
-    <MainLayout title="Dashboard" subtitle="LexFlow">
+    <MainLayout title="Dashboard" subtitle="Visão geral do escritório">
       <div className="space-y-6 animate-fade-in">
         {/* Top Row - Key Metrics */}
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-          {/* Revenue */}
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-5">
+          {/* Closed Clients */}
           <div className="metric-card metric-card-primary">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Receita Mensal</span>
-              <div className="p-1.5 rounded-lg bg-primary/20">
-                <DollarSign className="w-4 h-4 text-primary" />
-              </div>
-            </div>
-            <p className="metric-number-blue">{formatCurrency(mockDashboardMetrics.monthlyRevenue)}</p>
-            <div className="flex items-center gap-1 mt-2 text-success text-xs font-medium">
-              <ArrowUpRight className="w-3 h-3" />
-              <span>12.5%</span>
-              <span className="text-muted-foreground">vs mês anterior</span>
-            </div>
-          </div>
-
-          {/* Pending */}
-          <div className="metric-card">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">A Receber</span>
-              <div className="p-1.5 rounded-lg bg-warning/20">
-                <Clock className="w-4 h-4 text-warning" />
-              </div>
-            </div>
-            <p className="metric-number">{formatCurrency(totalPending)}</p>
-            <div className="flex items-center gap-1 mt-2 text-warning text-xs font-medium">
-              <span>8 parcelas pendentes</span>
-            </div>
-          </div>
-
-          {/* Active Clients */}
-          <div className="metric-card">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Clientes Ativos</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Clientes Fechados</span>
               <div className="p-1.5 rounded-lg bg-primary/20">
                 <Users className="w-4 h-4 text-primary" />
               </div>
             </div>
-            <p className="metric-number">{mockDashboardMetrics.activeClients}</p>
-            <div className="flex items-center gap-1 mt-2 text-success text-xs font-medium">
-              <ArrowUpRight className="w-3 h-3" />
-              <span>+8 este mês</span>
+            <p className="text-3xl font-bold text-foreground">{closedClientsThisMonth}</p>
+            <div className="flex items-center gap-1 mt-2 text-xs font-medium">
+              {Number(clientsPercentageChange) >= 0 ? (
+                <>
+                  <ArrowUpRight className="w-3 h-3 text-success" />
+                  <span className="text-success">+{clientsPercentageChange}%</span>
+                </>
+              ) : (
+                <>
+                  <ArrowDownRight className="w-3 h-3 text-destructive" />
+                  <span className="text-destructive">{clientsPercentageChange}%</span>
+                </>
+              )}
+              <span className="text-muted-foreground">vs mês anterior</span>
             </div>
           </div>
 
-          {/* Leads */}
-          <div className="metric-card">
+          {/* Overdue Tasks */}
+          <div className={cn(
+            "metric-card",
+            overdueTasks.length > 0 && "metric-card-danger"
+          )}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Novos Leads</span>
-              <div className="p-1.5 rounded-lg bg-primary/20">
-                <Target className="w-4 h-4 text-primary" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Tarefas Atrasadas</span>
+              <div className={cn(
+                "p-1.5 rounded-lg",
+                overdueTasks.length > 0 ? "bg-destructive/20" : "bg-muted"
+              )}>
+                <AlertTriangle className={cn(
+                  "w-4 h-4",
+                  overdueTasks.length > 0 ? "text-destructive" : "text-muted-foreground"
+                )} />
               </div>
             </div>
-            <p className="metric-number">{mockDashboardMetrics.totalLeads}</p>
-            <div className="flex items-center gap-1 mt-2 text-muted-foreground text-xs font-medium">
-              <span>Taxa de conversão: {mockDashboardMetrics.conversionRate}%</span>
+            <p className={cn(
+              "text-3xl font-bold",
+              overdueTasks.length > 0 ? "text-destructive" : "text-foreground"
+            )}>
+              {overdueTasks.length}
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">Requer atenção imediata</p>
+          </div>
+
+          {/* New Intimations */}
+          <div className={cn(
+            "metric-card",
+            pendingNotifications.length > 0 && "metric-card-warning"
+          )}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Novas Intimações</span>
+              <div className={cn(
+                "p-1.5 rounded-lg",
+                pendingNotifications.length > 0 ? "bg-warning/20" : "bg-muted"
+              )}>
+                <Gavel className={cn(
+                  "w-4 h-4",
+                  pendingNotifications.length > 0 ? "text-warning" : "text-muted-foreground"
+                )} />
+              </div>
             </div>
+            <p className={cn(
+              "text-3xl font-bold",
+              pendingNotifications.length > 0 ? "text-warning" : "text-foreground"
+            )}>
+              {pendingNotifications.length}
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">Aguardando análise</p>
+          </div>
+
+          {/* Chats Needing Attention */}
+          <div className={cn(
+            "metric-card",
+            chatsNeedingAttention > 0 && "metric-card-primary"
+          )}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Chats Pendentes</span>
+              <div className="p-1.5 rounded-lg bg-primary/20">
+                <MessageSquare className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+            <p className="text-3xl font-bold text-primary">{chatsNeedingAttention}</p>
+            <p className="text-xs text-muted-foreground mt-2">Precisam de resposta</p>
+          </div>
+
+          {/* Conversion Rate */}
+          <div className="metric-card">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Taxa de Conversão</span>
+              <div className="p-1.5 rounded-lg bg-success/20">
+                <Target className="w-4 h-4 text-success" />
+              </div>
+            </div>
+            <p className="text-3xl font-bold text-success">{mockDashboardMetrics.conversionRate}%</p>
+            <p className="text-xs text-muted-foreground mt-2">De leads para clientes</p>
           </div>
         </div>
 
         {/* Charts Row */}
         <div className="grid gap-4 lg:grid-cols-3">
-          {/* Revenue Chart */}
+          {/* Revenue vs Expenses Chart */}
           <div className="lg:col-span-2 dashboard-card">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-base font-semibold text-foreground">Receita</h3>
-                <p className="text-xs text-muted-foreground">Últimos 7 meses</p>
+                <h3 className="text-base font-semibold text-foreground">Receita vs Despesas</h3>
+                <p className="text-xs text-muted-foreground">Comparativo dos últimos 7 meses</p>
               </div>
-              <div className="flex items-center gap-2 text-xs">
-                <span className="flex items-center gap-1">
+              <div className="flex items-center gap-4 text-xs">
+                <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded bg-primary" />
                   <span className="text-muted-foreground">Receita</span>
                 </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded bg-destructive/70" />
+                  <span className="text-muted-foreground">Despesas</span>
+                </span>
               </div>
             </div>
-            <div className="h-64">
+            <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueData}>
+                <AreaChart data={revenueVsExpensesData}>
                   <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(217, 91%, 60%)" stopOpacity={0.3}/>
                       <stop offset="95%" stopColor="hsl(217, 91%, 60%)" stopOpacity={0}/>
                     </linearGradient>
+                    <linearGradient id="colorDespesa" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="hsl(0, 84%, 60%)" stopOpacity={0}/>
+                    </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis 
                     dataKey="month" 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: 'hsl(217, 20%, 50%)', fontSize: 12 }}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                   />
                   <YAxis 
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: 'hsl(217, 20%, 50%)', fontSize: 12 }}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                     tickFormatter={(value) => `${value/1000}k`}
                   />
                   <Tooltip 
                     contentStyle={{ 
-                      background: 'hsl(222, 47%, 11%)', 
-                      border: '1px solid hsl(222, 30%, 18%)',
-                      borderRadius: '8px',
-                      color: 'hsl(210, 40%, 98%)'
+                      background: 'hsl(var(--popover))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '12px',
+                      color: 'hsl(var(--popover-foreground))'
                     }}
-                    formatter={(value: number) => [formatCurrency(value), 'Receita']}
+                    formatter={(value: number, name: string) => [formatCurrency(value), name === 'receita' ? 'Receita' : 'Despesas']}
                   />
                   <Area 
                     type="monotone" 
-                    dataKey="value" 
+                    dataKey="receita" 
                     stroke="hsl(217, 91%, 60%)" 
                     strokeWidth={2}
                     fillOpacity={1} 
-                    fill="url(#colorRevenue)" 
+                    fill="url(#colorReceita)" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="despesa" 
+                    stroke="hsl(0, 84%, 60%)" 
+                    strokeWidth={2}
+                    fillOpacity={1} 
+                    fill="url(#colorDespesa)" 
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Leads Chart */}
-          <div className="dashboard-card">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-base font-semibold text-foreground">Leads</h3>
-                <p className="text-xs text-muted-foreground">Esta semana</p>
+          {/* Quick Stats Panel */}
+          <div className="space-y-4">
+            {/* Revenue Card */}
+            <div className="dashboard-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Receita do Mês</p>
+                  <p className="text-2xl font-bold text-primary mt-1">{formatCurrency(mockDashboardMetrics.monthlyRevenue)}</p>
+                </div>
+                <div className="p-3 rounded-xl bg-primary/20">
+                  <TrendingUp className="w-6 h-6 text-primary" />
+                </div>
+              </div>
+              <div className="flex items-center gap-1 mt-3 text-success text-xs font-medium">
+                <ArrowUpRight className="w-3 h-3" />
+                <span>+12.5% vs mês anterior</span>
               </div>
             </div>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={leadsData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" vertical={false} />
-                  <XAxis 
-                    dataKey="name" 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: 'hsl(217, 20%, 50%)', fontSize: 12 }}
-                  />
-                  <YAxis 
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: 'hsl(217, 20%, 50%)', fontSize: 12 }}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      background: 'hsl(222, 47%, 11%)', 
-                      border: '1px solid hsl(222, 30%, 18%)',
-                      borderRadius: '8px',
-                      color: 'hsl(210, 40%, 98%)'
-                    }}
-                  />
-                  <Bar dataKey="leads" fill="hsl(217, 91%, 60%)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="converted" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+
+            {/* Pending Payments */}
+            <div className="dashboard-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">A Receber</p>
+                  <p className="text-2xl font-bold text-warning mt-1">
+                    {formatCurrency(mockPayments.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0))}
+                  </p>
+                </div>
+                <div className="p-3 rounded-xl bg-warning/20">
+                  <Clock className="w-6 h-6 text-warning" />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">8 parcelas pendentes</p>
+            </div>
+
+            {/* Active Clients */}
+            <div className="dashboard-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Clientes Ativos</p>
+                  <p className="text-2xl font-bold text-foreground mt-1">{mockDashboardMetrics.activeClients}</p>
+                </div>
+                <div className="p-3 rounded-xl bg-success/20">
+                  <Users className="w-6 h-6 text-success" />
+                </div>
+              </div>
+              <div className="flex items-center gap-1 mt-3 text-success text-xs font-medium">
+                <ArrowUpRight className="w-3 h-3" />
+                <span>+8 este mês</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Alerts Row */}
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-          {/* Overdue Tasks */}
+        {/* Team Performance */}
+        <div className="dashboard-card">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-base font-semibold text-foreground">Desempenho da Equipe</h3>
+              <p className="text-xs text-muted-foreground">Tarefas realizadas vs atribuídas</p>
+            </div>
+            <a href="/team" className="text-xs text-primary hover:underline">Ver todos</a>
+          </div>
+          
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {teamPerformance.slice(0, 4).map((member) => (
+              <div key={member.id} className="p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors">
+                <div className="flex items-center gap-3 mb-4">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-primary/20 text-primary font-bold text-sm">
+                      {member.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{member.name}</p>
+                    <p className="text-xs text-muted-foreground">{member.role}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Realizadas</span>
+                    <span className="font-semibold text-success">{member.completedTasks}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Atribuídas</span>
+                    <span className="font-semibold">{member.assignedTasks}</span>
+                  </div>
+                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500"
+                      style={{ width: `${member.completionRate}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Taxa de conclusão</span>
+                    <span className="text-xs font-bold text-primary">{member.completionRate}%</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom Row - Alerts */}
+        <div className="grid gap-4 lg:grid-cols-2">
+          {/* Overdue Tasks List */}
           <div className={cn(
-            "metric-card",
-            overdueTasks.length > 0 && "metric-card-danger"
+            "dashboard-card",
+            overdueTasks.length > 0 && "border-destructive/30"
           )}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -237,38 +361,57 @@ export default function Dashboard() {
                   overdueTasks.length > 0 ? "bg-destructive/20" : "bg-muted"
                 )}>
                   <AlertTriangle className={cn(
-                    "w-4 h-4",
+                    "w-5 h-5",
                     overdueTasks.length > 0 ? "text-destructive" : "text-muted-foreground"
                   )} />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">Tarefas Atrasadas</p>
-                  <p className="text-xs text-muted-foreground">Requer atenção</p>
+                  <h3 className="font-semibold">Tarefas Atrasadas</h3>
+                  <p className="text-xs text-muted-foreground">{overdueTasks.length} tarefas precisam de atenção</p>
                 </div>
               </div>
-              <p className={cn(
-                "text-2xl font-bold",
-                overdueTasks.length > 0 ? "text-destructive" : "text-muted-foreground"
-              )}>
-                {overdueTasks.length}
-              </p>
             </div>
-            {overdueTasks.length > 0 && (
-              <div className="space-y-2">
-                {overdueTasks.slice(0, 2).map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-2 rounded-lg bg-background/50 text-xs">
-                    <span className="truncate flex-1">{task.title}</span>
-                    <span className="text-destructive font-medium ml-2">Atrasada</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            
+            <div className="space-y-2">
+              {overdueTasks.length > 0 ? (
+                overdueTasks.slice(0, 4).map((task) => {
+                  const assignee = mockTeamMembers.find(m => m.id === task.assignedTo);
+                  return (
+                    <div 
+                      key={task.id} 
+                      className="flex items-center justify-between p-3 rounded-lg bg-destructive/10 border border-destructive/20 hover:bg-destructive/20 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="bg-destructive/20 text-destructive text-xs font-medium">
+                            {assignee?.avatar || '??'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-sm font-medium">{task.title}</p>
+                          <p className="text-xs text-muted-foreground">{assignee?.name || 'Não atribuído'}</p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-semibold text-destructive px-2 py-1 rounded-lg bg-destructive/20">
+                        Atrasada
+                      </span>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-8">
+                  <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-2" />
+                  <p className="text-sm font-medium">Nenhuma tarefa atrasada!</p>
+                  <p className="text-xs text-muted-foreground">Todas as tarefas estão em dia</p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Court Notifications */}
           <div className={cn(
-            "metric-card",
-            pendingNotifications.length > 0 && "metric-card-warning"
+            "dashboard-card",
+            pendingNotifications.length > 0 && "border-warning/30"
           )}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -277,120 +420,41 @@ export default function Dashboard() {
                   pendingNotifications.length > 0 ? "bg-warning/20" : "bg-muted"
                 )}>
                   <Gavel className={cn(
-                    "w-4 h-4",
+                    "w-5 h-5",
                     pendingNotifications.length > 0 ? "text-warning" : "text-muted-foreground"
                   )} />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">Novas Intimações</p>
-                  <p className="text-xs text-muted-foreground">Aguardando análise</p>
+                  <h3 className="font-semibold">Intimações Pendentes</h3>
+                  <p className="text-xs text-muted-foreground">{pendingNotifications.length} aguardando análise</p>
                 </div>
               </div>
-              <p className={cn(
-                "text-2xl font-bold",
-                pendingNotifications.length > 0 ? "text-warning" : "text-muted-foreground"
-              )}>
-                {pendingNotifications.length}
-              </p>
+              <a href="/intimacoes" className="text-xs text-primary hover:underline">Ver todas</a>
             </div>
-            {pendingNotifications.length > 0 && (
-              <div className="space-y-2">
-                {pendingNotifications.slice(0, 2).map((notif) => (
-                  <div key={notif.id} className="flex items-center justify-between p-2 rounded-lg bg-background/50 text-xs">
-                    <span className="truncate flex-1">{notif.type}</span>
-                    <span className="text-warning font-medium ml-2">Nova</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Contracts */}
-          <div className="metric-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-success/20">
-                  <FileText className="w-4 h-4 text-success" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">Contratos</p>
-                  <p className="text-xs text-muted-foreground">Este mês</p>
-                </div>
-              </div>
-              <p className="text-2xl font-bold text-success">23</p>
-            </div>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span>5 novos contratos</span>
-              <span className="text-success font-medium">+18%</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Row - Team & Clients */}
-        <div className="grid gap-4 lg:grid-cols-2">
-          {/* Team Performance */}
-          <div className="dashboard-card">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-semibold">Equipe</h3>
-              <a href="/team" className="text-xs text-primary hover:underline">Ver todos</a>
-            </div>
-            <div className="space-y-4">
-              {mockTeamMembers.filter(m => m.status === 'active').slice(0, 4).map((member) => {
-                const completed = member.tasksCompleted;
-                const pending = member.tasksPending;
-                const progress = completed / (completed + pending) * 100 || 0;
-
-                return (
-                  <div key={member.id} className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-9 h-9 rounded-lg font-semibold text-xs bg-primary/20 text-primary">
-                      {member.avatar}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <p className="text-sm font-medium truncate">{member.name}</p>
-                        <span className="text-xs text-muted-foreground">{completed} tarefas</span>
-                      </div>
-                      <div className="progress-bar">
-                        <div className="progress-fill" style={{ width: `${progress}%` }} />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Recent Clients */}
-          <div className="dashboard-card">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-semibold">Clientes Recentes</h3>
-              <a href="/clients" className="text-xs text-primary hover:underline">Ver todos</a>
-            </div>
-            <div className="space-y-3">
-              {mockClients.slice(0, 4).map((client) => (
-                <div 
-                  key={client.id} 
-                  className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-9 h-9 rounded-lg font-semibold text-xs bg-primary/20 text-primary">
-                      {client.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                    </div>
+            
+            <div className="space-y-2">
+              {pendingNotifications.length > 0 ? (
+                pendingNotifications.slice(0, 4).map((notif) => (
+                  <div 
+                    key={notif.id} 
+                    className="flex items-center justify-between p-3 rounded-lg bg-warning/10 border border-warning/20 hover:bg-warning/20 transition-colors cursor-pointer"
+                  >
                     <div>
-                      <p className="text-sm font-medium">{client.name}</p>
-                      <p className="text-xs text-muted-foreground">{client.email}</p>
+                      <p className="text-sm font-medium">{notif.type}</p>
+                      <p className="text-xs text-muted-foreground font-mono">{notif.processNumber}</p>
                     </div>
+                    <span className="text-xs font-semibold px-2 py-1 rounded-lg bg-warning/20 text-warning">
+                      Nova
+                    </span>
                   </div>
-                  <span className={cn(
-                    "px-2 py-1 rounded-full text-xs font-medium",
-                    client.status === 'active' 
-                      ? "bg-success/20 text-success" 
-                      : "bg-muted text-muted-foreground"
-                  )}>
-                    {client.status === 'active' ? 'Ativo' : 'Inativo'}
-                  </span>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Gavel className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm font-medium">Nenhuma intimação pendente</p>
+                  <p className="text-xs text-muted-foreground">Todas as intimações foram analisadas</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
