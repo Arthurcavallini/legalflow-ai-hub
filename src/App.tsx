@@ -8,7 +8,7 @@ import CRM from "./pages/CRM";
 import Production from "./pages/Production";
 import Clients from "./pages/Clients";
 import Financial from "./pages/Financial";
-import Inbox from "./pages/Inbox";
+
 import Team from "./pages/Team";
 import Contracts from "./pages/Contracts";
 import Services from "./pages/Services";
@@ -27,7 +27,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/inbox" element={<Inbox />} />
+          
           <Route path="/intimacoes" element={<Intimacoes />} />
           <Route path="/crm" element={<CRM />} />
           <Route path="/production" element={<Production />} />
