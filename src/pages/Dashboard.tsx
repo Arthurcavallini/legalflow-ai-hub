@@ -80,36 +80,39 @@ function MetricCard({
 
   return (
     <div className={cn(
-      'rounded-2xl border p-5 transition-all duration-200 hover:shadow-lg hover:shadow-primary/5',
+      'rounded-2xl border p-5 transition-all duration-200 hover:shadow-lg hover:shadow-primary/5 h-full flex flex-col',
       style.card
     )}>
-      <div className="flex items-start justify-between">
-        <div className="space-y-3">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
-          <p className={cn('text-3xl font-bold tracking-tight', style.value)}>{value}</p>
-          {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
-          )}
-          {change !== undefined && (
-            <div className="flex items-center gap-1.5">
-              {isPositive ? (
-                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
-              ) : (
-                <ArrowDownRight className="w-3.5 h-3.5 text-destructive" />
-              )}
-              <span className={cn(
-                'text-xs font-semibold',
-                isPositive ? 'text-success' : 'text-destructive'
-              )}>
-                {isPositive && '+'}{change}%
-              </span>
-              {changeLabel && (
-                <span className="text-xs text-muted-foreground">{changeLabel}</span>
-              )}
-            </div>
-          )}
+      <div className="flex items-start justify-between flex-1">
+        <div className="flex flex-col justify-between h-full">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+            <p className={cn('text-3xl font-bold tracking-tight mt-2', style.value)}>{value}</p>
+          </div>
+          <div className="mt-3">
+            {change !== undefined ? (
+              <div className="flex items-center gap-1.5">
+                {isPositive ? (
+                  <ArrowUpRight className="w-3.5 h-3.5 text-success" />
+                ) : (
+                  <ArrowDownRight className="w-3.5 h-3.5 text-destructive" />
+                )}
+                <span className={cn(
+                  'text-xs font-semibold',
+                  isPositive ? 'text-success' : 'text-destructive'
+                )}>
+                  {isPositive && '+'}{change}%
+                </span>
+                {changeLabel && (
+                  <span className="text-xs text-muted-foreground">{changeLabel}</span>
+                )}
+              </div>
+            ) : subtitle ? (
+              <p className="text-xs text-muted-foreground">{subtitle}</p>
+            ) : null}
+          </div>
         </div>
-        <div className={cn('p-3 rounded-xl', style.icon)}>
+        <div className={cn('p-3 rounded-xl flex-shrink-0', style.icon)}>
           <Icon className="w-5 h-5" />
         </div>
       </div>
@@ -136,34 +139,38 @@ function StatCard({
   iconBg?: string;
 }) {
   return (
-    <div className="bg-card rounded-2xl border border-border p-5 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200">
+    <div className="bg-card rounded-2xl border border-border p-5 hover:shadow-lg hover:shadow-primary/5 transition-all duration-200 flex-1 flex flex-col justify-between">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{label}</p>
           <p className="text-2xl font-bold text-foreground">{value}</p>
         </div>
-        <div className={cn('p-3 rounded-xl', iconBg)}>
+        <div className={cn('p-3 rounded-xl flex-shrink-0', iconBg)}>
           <Icon className={cn('w-5 h-5', iconColor)} />
         </div>
       </div>
-      {trend && (
-        <div className="flex items-center gap-1.5 mt-3">
-          {trend.isPositive ? (
-            <ArrowUpRight className="w-3.5 h-3.5 text-success" />
-          ) : (
-            <ArrowDownRight className="w-3.5 h-3.5 text-destructive" />
-          )}
-          <span className={cn(
-            'text-xs font-semibold',
-            trend.isPositive ? 'text-success' : 'text-destructive'
-          )}>
-            {trend.isPositive && '+'}{trend.value}%
-          </span>
-          {trendLabel && (
-            <span className="text-xs text-muted-foreground">{trendLabel}</span>
-          )}
-        </div>
-      )}
+      <div className="mt-3">
+        {trend ? (
+          <div className="flex items-center gap-1.5">
+            {trend.isPositive ? (
+              <ArrowUpRight className="w-3.5 h-3.5 text-success" />
+            ) : (
+              <ArrowDownRight className="w-3.5 h-3.5 text-destructive" />
+            )}
+            <span className={cn(
+              'text-xs font-semibold',
+              trend.isPositive ? 'text-success' : 'text-destructive'
+            )}>
+              {trend.isPositive && '+'}{trend.value}%
+            </span>
+            {trendLabel && (
+              <span className="text-xs text-muted-foreground">{trendLabel}</span>
+            )}
+          </div>
+        ) : trendLabel ? (
+          <p className="text-xs text-muted-foreground">{trendLabel}</p>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -330,7 +337,7 @@ export default function Dashboard() {
           </div>
 
           {/* Side Stats */}
-          <div className="space-y-5">
+          <div className="flex flex-col gap-5">
             <StatCard
               label="Receita do Mês"
               value={formatCurrency(mockDashboardMetrics.monthlyRevenue)}
