@@ -28,9 +28,9 @@ export default function Team() {
   };
 
   const statusConfig = {
-    active: { label: 'Ativo', color: 'bg-success/20 text-success' },
-    vacation: { label: 'Férias', color: 'bg-warning/20 text-warning' },
-    inactive: { label: 'Inativo', color: 'bg-muted text-muted-foreground' },
+    active: { label: 'Ativo', color: 'bg-success/10 text-success border-success/20' },
+    vacation: { label: 'Férias', color: 'bg-warning/10 text-warning border-warning/20' },
+    inactive: { label: 'Inativo', color: 'bg-muted text-muted-foreground border-border' },
   };
 
   const totalMembers = mockTeamMembers.length;
@@ -39,39 +39,39 @@ export default function Team() {
   const totalPending = mockTeamMembers.reduce((sum, m) => sum + m.tasksPending, 0);
 
   return (
-    <MainLayout title="Equipe" subtitle="Gestão">
+    <MainLayout title="Equipe" subtitle="Gestão de colaboradores">
       <div className="space-y-6">
         {/* Summary Cards */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-          <div className="metric-card">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Total</span>
-            <p className="text-3xl font-bold mt-2">{totalMembers}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Total</span>
+            <p className="text-2xl font-bold mt-1">{totalMembers}</p>
           </div>
-          <div className="metric-card metric-card-success">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Ativos</span>
-            <p className="text-3xl font-bold mt-2 text-success">{activeMembers}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Ativos</span>
+            <p className="text-2xl font-bold mt-1 text-success">{activeMembers}</p>
           </div>
-          <div className="metric-card metric-card-primary">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Concluídas</span>
-            <p className="text-3xl font-bold mt-2 text-primary">{totalCompleted}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Concluídas</span>
+            <p className="text-2xl font-bold mt-1 text-primary">{totalCompleted}</p>
           </div>
-          <div className="metric-card metric-card-warning">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Pendentes</span>
-            <p className="text-3xl font-bold mt-2 text-warning">{totalPending}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Pendentes</span>
+            <p className="text-2xl font-bold mt-1 text-warning">{totalPending}</p>
           </div>
         </div>
 
         {/* Actions Bar */}
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          <div className="relative flex-1 sm:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="relative flex-1 sm:w-64">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
               type="search" 
               placeholder="Buscar membros..." 
-              className="pl-9" 
+              className="pl-8 h-9" 
             />
           </div>
-          <Button className="gap-2 bg-primary hover:bg-primary/90 text-sm">
+          <Button size="sm" className="gap-1.5 h-9 bg-primary hover:bg-primary/90">
             <Plus className="w-4 h-4" />
             Adicionar Membro
           </Button>
@@ -94,18 +94,18 @@ export default function Team() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <Avatar className="h-11 w-11 rounded-lg">
-                        <AvatarFallback className="bg-primary/20 text-primary text-sm font-bold rounded-lg">
+                      <Avatar className="h-10 w-10 rounded-lg">
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold rounded-lg">
                           {member.avatar}
                         </AvatarFallback>
                       </Avatar>
                       <span className={cn(
-                        'absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card',
+                        'absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-card',
                         member.status === 'active' ? 'bg-success' : member.status === 'vacation' ? 'bg-warning' : 'bg-muted-foreground'
                       )} />
                     </div>
                     <div>
-                      <p className="font-semibold text-sm">{member.name}</p>
+                      <p className="font-medium text-sm">{member.name}</p>
                       <p className="text-xs text-muted-foreground">{member.role}</p>
                     </div>
                   </div>
@@ -115,15 +115,15 @@ export default function Team() {
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-popover border-border">
-                      <DropdownMenuItem className="text-sm">Ver perfil</DropdownMenuItem>
-                      <DropdownMenuItem className="text-sm">Ver tarefas</DropdownMenuItem>
-                      <DropdownMenuItem className="text-sm">Editar</DropdownMenuItem>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Ver perfil</DropdownMenuItem>
+                      <DropdownMenuItem>Ver tarefas</DropdownMenuItem>
+                      <DropdownMenuItem>Editar</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
 
-                <Badge className={cn("text-xs mb-4", status.color)}>
+                <Badge variant="outline" className={cn("text-xs mb-4 border", status.color)}>
                   {status.label}
                 </Badge>
 
@@ -132,16 +132,16 @@ export default function Team() {
                   {overdue > 0 && (
                     <div className="flex items-center gap-1 text-destructive">
                       <AlertTriangle className="w-3.5 h-3.5" />
-                      <span className="text-sm font-bold">{overdue}</span>
+                      <span className="text-sm font-semibold">{overdue}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1 text-warning">
                     <Clock className="w-3.5 h-3.5" />
-                    <span className="text-sm font-bold">{pending + inProgress}</span>
+                    <span className="text-sm font-semibold">{pending + inProgress}</span>
                   </div>
                   <div className="flex items-center gap-1 text-success">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span className="text-sm font-bold">{completed}</span>
+                    <span className="text-sm font-semibold">{completed}</span>
                   </div>
                 </div>
 
@@ -149,11 +149,11 @@ export default function Team() {
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Produtividade</span>
-                    <span className="font-bold">{productivity}%</span>
+                    <span className="font-semibold">{productivity}%</span>
                   </div>
-                  <div className="progress-bar">
+                  <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
                     <div 
-                      className="progress-fill"
+                      className="h-full bg-primary rounded-full transition-all"
                       style={{ width: `${productivity}%` }}
                     />
                   </div>

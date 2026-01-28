@@ -374,7 +374,7 @@ export default function Financial() {
             <div className="grid gap-6 lg:grid-cols-2">
               <div className="dashboard-card">
                 <h3 className="font-semibold mb-4">Receitas por Mês</h3>
-                <div className="h-48">
+                <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={cashFlowData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -396,7 +396,7 @@ export default function Financial() {
 
               <div className="dashboard-card">
                 <h3 className="font-semibold mb-4">Despesas por Mês</h3>
-                <div className="h-48">
+                <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={cashFlowData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
