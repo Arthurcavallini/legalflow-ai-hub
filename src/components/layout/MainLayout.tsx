@@ -31,10 +31,10 @@ export function MainLayout({ children, title, subtitle }: MainLayoutProps) {
   const toggleTheme = () => setIsDark(!isDark);
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
+    <div className="min-h-screen bg-background transition-colors duration-200">
       <Sidebar isDark={isDark} onToggleTheme={toggleTheme} />
-      <div className="pl-64 transition-all duration-300">
-        <Header title={title} subtitle={subtitle} isDark={isDark} onToggleTheme={toggleTheme} />
+      <div className="pl-60 transition-all duration-300">
+        <Header title={title} subtitle={subtitle || ''} />
         <main className="p-6 animate-fade-in">{children}</main>
       </div>
     </div>
