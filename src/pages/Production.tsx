@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { mockTasks, mockProcesses, mockClients } from '@/data/mockData';
+import { mockTasks, mockClients } from '@/data/mockData';
+import { Task } from '@/types';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { TaskDetailSheet } from '@/components/production/TaskDetailSheet';
 
 const productionColumns = [
   { id: 'pending', label: 'Pendentes', icon: Clock, color: 'text-primary' },
@@ -29,7 +32,12 @@ const productionColumns = [
   { id: 'overdue', label: 'Atrasadas', icon: AlertTriangle, color: 'text-destructive' },
 ];
 
-function TaskCard({ task }: { task: typeof mockTasks[0] }) {
+interface TaskCardProps {
+  task: Task;
+  onSelect: (task: Task) => void;
+}
+
+function TaskCard({ task, onSelect }: TaskCardProps) {
   const client = mockClients.find((c) => c.id === task.clientId);
 
   const priorityStyles = {
@@ -44,22 +52,28 @@ function TaskCard({ task }: { task: typeof mockTasks[0] }) {
     low: { label: 'Baixa', color: 'bg-primary/10 text-primary border-primary/20' },
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('[data-dropdown]')) return;
+    onSelect(task);
+  };
+
   return (
     <div
+      onClick={handleClick}
       className={cn(
-        'bg-card rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border-l-4 animate-fade-in',
+        'bg-card rounded-lg border border-border p-4 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 cursor-pointer border-l-4 animate-fade-in',
         priorityStyles[task.priority]
       )}
     >
       <div className="flex items-start justify-between mb-2">
         <h4 className="font-medium text-sm line-clamp-2">{task.title}</h4>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild data-dropdown>
             <Button variant="ghost" size="icon" className="h-6 w-6 -mr-1">
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="bg-popover border-border">
             <DropdownMenuItem>Editar</DropdownMenuItem>
             <DropdownMenuItem>Mover para...</DropdownMenuItem>
             <DropdownMenuItem>Marcar como concluída</DropdownMenuItem>
@@ -105,6 +119,8 @@ function TaskCard({ task }: { task: typeof mockTasks[0] }) {
 }
 
 export default function Production() {
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
   const getTasksByStatus = (status: string) =>
     mockTasks.filter((task) => task.status === status);
 
@@ -153,7 +169,7 @@ export default function Production() {
                 </div>
                 <div className="space-y-3">
                   {tasks.map((task) => (
-                    <TaskCard key={task.id} task={task} />
+                    <TaskCard key={task.id} task={task} onSelect={setSelectedTask} />
                   ))}
                   {tasks.length === 0 && (
                     <div className="flex items-center justify-center h-24 border-2 border-dashed border-border rounded-lg text-sm text-muted-foreground">
@@ -166,6 +182,13 @@ export default function Production() {
           })}
         </div>
       </div>
+
+      {/* Task Detail Sheet */}
+      <TaskDetailSheet
+        task={selectedTask}
+        open={!!selectedTask}
+        onOpenChange={(open) => !open && setSelectedTask(null)}
+      />
     </MainLayout>
   );
 }

@@ -7,34 +7,18 @@ import {
   Calendar, 
   MoreHorizontal, 
   MessageSquare, 
-  Mail, 
-  MapPin, 
-  FileText, 
-  Clock, 
-  TrendingUp,
-  Sparkles,
-  User,
-  Briefcase,
-  DollarSign,
-  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { LeadDetailSheet } from './LeadDetailSheet';
 
 const columns = [
   { id: 'new', label: 'Novos', color: 'bg-primary' },
@@ -75,9 +59,11 @@ function generateAISummary(lead: Lead): string {
   return summaries[Math.floor(Math.random() * summaries.length)];
 }
 
+type ExtendedLead = ReturnType<typeof getExtendedLeadData>;
+
 interface LeadCardProps {
   lead: Lead;
-  onSelect: (lead: ReturnType<typeof getExtendedLeadData>) => void;
+  onSelect: (lead: ExtendedLead) => void;
 }
 
 function LeadCard({ lead, onSelect }: LeadCardProps) {
@@ -159,60 +145,11 @@ function LeadCard({ lead, onSelect }: LeadCardProps) {
   );
 }
 
-// AI Summary Floating Bubble
-function AISummaryBubble({ summary, isVisible }: { summary: string; isVisible: boolean }) {
-  if (!isVisible) return null;
-  
-  return (
-    <div className="absolute -top-2 -right-2 z-10">
-      <div className="relative">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg animate-pulse cursor-pointer group">
-          <Sparkles className="w-4 h-4 text-white" />
-          
-          {/* Tooltip on hover */}
-          <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-popover border border-border rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-purple-500" />
-              <span className="text-xs font-semibold text-purple-500">Resumo IA</span>
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">{summary}</p>
-          </div>
-        </div>
-        
-        {/* Spinning ring */}
-        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-purple-400 animate-spin" />
-      </div>
-    </div>
-  );
-}
-
 export function KanbanBoard() {
-  const [selectedLead, setSelectedLead] = useState<ReturnType<typeof getExtendedLeadData> | null>(null);
+  const [selectedLead, setSelectedLead] = useState<ExtendedLead | null>(null);
   
   const getLeadsByStatus = (status: string) =>
     mockLeads.filter((lead) => lead.status === status);
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-    }).format(value);
-  };
-
-  const urgencyLabels = {
-    high: { label: 'Alta', color: 'bg-destructive/10 text-destructive border-destructive/20' },
-    medium: { label: 'Média', color: 'bg-warning/10 text-warning border-warning/20' },
-    low: { label: 'Baixa', color: 'bg-primary/10 text-primary border-primary/20' },
-  };
-
-  const statusLabels = {
-    new: { label: 'Novo', color: 'bg-primary/10 text-primary' },
-    qualified: { label: 'Qualificado', color: 'bg-cyan-500/10 text-cyan-600' },
-    proposal: { label: 'Proposta', color: 'bg-warning/10 text-warning' },
-    negotiation: { label: 'Negociação', color: 'bg-purple-500/10 text-purple-600' },
-    closed: { label: 'Fechado', color: 'bg-success/10 text-success' },
-  };
 
   return (
     <>
@@ -232,13 +169,7 @@ export function KanbanBoard() {
               </div>
               <div className="space-y-3">
                 {leads.map((lead) => (
-                  <div key={lead.id} className="relative">
-                    <AISummaryBubble 
-                      summary={generateAISummary(lead)} 
-                      isVisible={lead.source === 'whatsapp'} 
-                    />
-                    <LeadCard lead={lead} onSelect={setSelectedLead} />
-                  </div>
+                  <LeadCard key={lead.id} lead={lead} onSelect={setSelectedLead} />
                 ))}
                 {leads.length === 0 && (
                   <div className="flex items-center justify-center h-32 border-2 border-dashed border-border rounded-lg text-xs text-muted-foreground">
@@ -251,182 +182,12 @@ export function KanbanBoard() {
         })}
       </div>
 
-      {/* Lead Detail Modal */}
-      <Dialog open={!!selectedLead} onOpenChange={() => setSelectedLead(null)}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-0">
-          {selectedLead && (
-            <>
-              {/* Modal Header */}
-              <div className="p-6 pb-4 border-b border-border">
-                <div className="flex items-start gap-4">
-                  <Avatar className="h-14 w-14">
-                    <AvatarFallback className="bg-primary text-primary-foreground text-lg font-bold">
-                      {selectedLead.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <DialogTitle className="text-xl mb-1">{selectedLead.name}</DialogTitle>
-                    <p className="text-muted-foreground">{selectedLead.caseType}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge className={cn("text-xs", statusLabels[selectedLead.status as keyof typeof statusLabels]?.color)}>
-                        {statusLabels[selectedLead.status as keyof typeof statusLabels]?.label}
-                      </Badge>
-                      <Badge variant="outline" className={cn("text-xs border", urgencyLabels[selectedLead.urgency].color)}>
-                        Urgência {urgencyLabels[selectedLead.urgency].label}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="gap-1.5">
-                      <Phone className="w-4 h-4" />
-                      Ligar
-                    </Button>
-                    <Button size="sm" className="gap-1.5 bg-success hover:bg-success/90">
-                      <MessageSquare className="w-4 h-4" />
-                      WhatsApp
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* AI Summary Card */}
-              <div className="mx-6 mt-4 p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                    <Sparkles className="w-3.5 h-3.5 text-white" />
-                  </div>
-                  <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">Resumo da IA</span>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{selectedLead.aiSummary}</p>
-              </div>
-
-              <Tabs defaultValue="info" className="p-6 pt-4">
-                <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="info">Informações</TabsTrigger>
-                  <TabsTrigger value="conversation">Conversa</TabsTrigger>
-                  <TabsTrigger value="activity">Atividade</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="info" className="space-y-6 mt-0">
-                  {/* Contact Info */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground mb-4">Dados de Contato</h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-muted-foreground uppercase">Email</p>
-                          <p className="text-sm font-medium truncate">{selectedLead.email}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <div>
-                          <p className="text-[10px] text-muted-foreground uppercase">Telefone</p>
-                          <p className="text-sm font-medium">{selectedLead.phone}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <div>
-                          <p className="text-[10px] text-muted-foreground uppercase">Localização</p>
-                          <p className="text-sm font-medium">{selectedLead.location}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <MessageSquare className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                        <div>
-                          <p className="text-[10px] text-muted-foreground uppercase">Origem</p>
-                          <p className="text-sm font-medium capitalize">{selectedLead.source}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Metrics */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground mb-4">Indicadores</h4>
-                    <div className="grid grid-cols-4 gap-3">
-                      <div className="text-center p-4 bg-primary/5 rounded-xl border border-primary/10">
-                        <p className="text-xl font-bold text-primary">{selectedLead.probability}%</p>
-                        <p className="text-[10px] text-muted-foreground uppercase mt-1">Probabilidade</p>
-                      </div>
-                      <div className="text-center p-4 bg-success/5 rounded-xl border border-success/10">
-                        <p className="text-xl font-bold text-success">{formatCurrency(selectedLead.estimatedValue)}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase mt-1">Valor Est.</p>
-                      </div>
-                      <div className="text-center p-4 bg-warning/5 rounded-xl border border-warning/10">
-                        <p className="text-xl font-bold text-warning">{selectedLead.totalMessages}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase mt-1">Mensagens</p>
-                      </div>
-                      <div className="text-center p-4 bg-muted/50 rounded-xl border border-border">
-                        <p className="text-xl font-bold text-foreground">{selectedLead.responseTime}m</p>
-                        <p className="text-[10px] text-muted-foreground uppercase mt-1">Tempo Resp.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Interests */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground mb-3">Interesses</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedLead.interests.map((interest, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {interest}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Notes */}
-                  {selectedLead.notes && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-foreground mb-3">Observações</h4>
-                      <p className="text-sm text-muted-foreground bg-secondary/40 rounded-xl p-4">
-                        {selectedLead.notes}
-                      </p>
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="conversation" className="space-y-4 mt-0">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-sm font-semibold">Histórico de Mensagens</h4>
-                    <Button variant="outline" size="sm" className="gap-1.5">
-                      <MessageSquare className="w-4 h-4" />
-                      Abrir Chat
-                    </Button>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {selectedLead.conversationHistory.map((msg, idx) => (
-                      <div 
-                        key={idx} 
-                        className={cn(
-                          "p-3 rounded-xl max-w-[80%]",
-                          msg.type === 'lead' 
-                            ? "bg-secondary/50 ml-0 mr-auto" 
-                            : "bg-primary/10 ml-auto mr-0"
-                        )}
-                      >
-                        <p className="text-sm">{msg.message}</p>
-                        <p className="text-[10px] text-muted-foreground mt-1">{msg.time}</p>
-                      </div>
-                    ))}
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="activity" className="space-y-4 mt-0">
-                  <div className="text-center py-8">
-                    <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground">Histórico de atividades em breve</p>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Lead Detail Sheet */}
+      <LeadDetailSheet 
+        lead={selectedLead} 
+        open={!!selectedLead} 
+        onOpenChange={(open) => !open && setSelectedLead(null)} 
+      />
     </>
   );
 }
