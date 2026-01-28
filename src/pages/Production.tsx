@@ -133,14 +133,14 @@ export default function Production() {
         </div>
 
         {/* Kanban Board */}
-        <div className="flex gap-4 overflow-x-auto pb-4">
+        <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2">
           {productionColumns.map((column) => {
             const tasks = getTasksByStatus(column.id);
             const Icon = column.icon;
             return (
               <div
                 key={column.id}
-                className="min-w-[300px] flex-shrink-0 bg-secondary/30 rounded-xl p-4 border border-border"
+                className="flex-1 min-w-[280px] bg-secondary/30 rounded-xl p-4 border border-border"
               >
                 <div className="flex items-center justify-between mb-4 px-1">
                   <div className="flex items-center gap-2">
