@@ -28,42 +28,36 @@ export default function Team() {
   };
 
   const statusConfig = {
-    active: { label: 'Ativo', color: 'bg-success/20 text-success border-success/30' },
-    vacation: { label: 'Férias', color: 'bg-warning/20 text-warning border-warning/30' },
+    active: { label: 'Ativo', color: 'bg-success/20 text-success' },
+    vacation: { label: 'Férias', color: 'bg-warning/20 text-warning' },
     inactive: { label: 'Inativo', color: 'bg-muted text-muted-foreground' },
   };
 
   const totalMembers = mockTeamMembers.length;
   const activeMembers = mockTeamMembers.filter(m => m.status === 'active').length;
-  const pendingTasks = mockTasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
-  const overdueTasks = mockTasks.filter(t => t.status === 'overdue').length;
+  const totalCompleted = mockTeamMembers.reduce((sum, m) => sum + m.tasksCompleted, 0);
+  const totalPending = mockTeamMembers.reduce((sum, m) => sum + m.tasksPending, 0);
 
   return (
-    <MainLayout title="Equipe" subtitle="Gestão de colaboradores e produtividade">
+    <MainLayout title="Equipe" subtitle="Gestão">
       <div className="space-y-6">
         {/* Summary Cards */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-          <div className="metric-card p-5">
-            <p className="text-sm text-muted-foreground mb-1">Total de Membros</p>
-            <p className="text-4xl font-bold text-foreground">{totalMembers}</p>
+          <div className="metric-card">
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Total</span>
+            <p className="text-3xl font-bold mt-2">{totalMembers}</p>
           </div>
-          <div className="metric-card metric-card-success p-5">
-            <p className="text-sm text-muted-foreground mb-1">Ativos</p>
-            <p className="text-4xl font-bold text-success">{activeMembers}</p>
+          <div className="metric-card metric-card-success">
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Ativos</span>
+            <p className="text-3xl font-bold mt-2 text-success">{activeMembers}</p>
           </div>
-          <div className="metric-card metric-card-warning p-5">
-            <p className="text-sm text-muted-foreground mb-1">Tarefas Pendentes</p>
-            <p className="text-4xl font-bold text-warning">{pendingTasks}</p>
+          <div className="metric-card metric-card-primary">
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Concluídas</span>
+            <p className="text-3xl font-bold mt-2 text-primary">{totalCompleted}</p>
           </div>
-          <div className={cn(
-            "metric-card p-5",
-            overdueTasks > 0 && "metric-card-danger"
-          )}>
-            <p className="text-sm text-muted-foreground mb-1">Tarefas Atrasadas</p>
-            <p className={cn(
-              "text-4xl font-bold",
-              overdueTasks > 0 ? "text-destructive" : "text-foreground"
-            )}>{overdueTasks}</p>
+          <div className="metric-card metric-card-warning">
+            <span className="text-xs text-muted-foreground uppercase tracking-wide">Pendentes</span>
+            <p className="text-3xl font-bold mt-2 text-warning">{totalPending}</p>
           </div>
         </div>
 
@@ -74,10 +68,10 @@ export default function Team() {
             <Input 
               type="search" 
               placeholder="Buscar membros..." 
-              className="pl-9 bg-secondary border-0 rounded-xl" 
+              className="pl-9" 
             />
           </div>
-          <Button className="gap-2 bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20">
+          <Button className="gap-2 bg-primary hover:bg-primary/90 text-sm">
             <Plus className="w-4 h-4" />
             Adicionar Membro
           </Button>
@@ -96,70 +90,70 @@ export default function Team() {
             const status = statusConfig[member.status];
 
             return (
-              <div key={member.id} className="metric-card p-5 hover:shadow-lg transition-all cursor-pointer">
+              <div key={member.id} className="dashboard-card">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <Avatar className="h-12 w-12 rounded-xl">
-                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-primary text-sm font-bold rounded-xl">
+                      <Avatar className="h-11 w-11 rounded-lg">
+                        <AvatarFallback className="bg-primary/20 text-primary text-sm font-bold rounded-lg">
                           {member.avatar}
                         </AvatarFallback>
                       </Avatar>
                       <span className={cn(
-                        'absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-card',
+                        'absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card',
                         member.status === 'active' ? 'bg-success' : member.status === 'vacation' ? 'bg-warning' : 'bg-muted-foreground'
                       )} />
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground">{member.name}</p>
-                      <p className="text-sm text-muted-foreground">{member.role}</p>
+                      <p className="font-semibold text-sm">{member.name}</p>
+                      <p className="text-xs text-muted-foreground">{member.role}</p>
                     </div>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-secondary">
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-popover border-border rounded-xl">
-                      <DropdownMenuItem className="rounded-lg cursor-pointer">Ver perfil</DropdownMenuItem>
-                      <DropdownMenuItem className="rounded-lg cursor-pointer">Ver tarefas</DropdownMenuItem>
-                      <DropdownMenuItem className="rounded-lg cursor-pointer">Editar</DropdownMenuItem>
+                    <DropdownMenuContent align="end" className="bg-popover border-border">
+                      <DropdownMenuItem className="text-sm">Ver perfil</DropdownMenuItem>
+                      <DropdownMenuItem className="text-sm">Ver tarefas</DropdownMenuItem>
+                      <DropdownMenuItem className="text-sm">Editar</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
 
-                <Badge variant="outline" className={cn("rounded-lg mb-4", status.color)}>
+                <Badge className={cn("text-xs mb-4", status.color)}>
                   {status.label}
                 </Badge>
 
                 {/* Task Stats */}
                 <div className="flex items-center gap-4 mb-4">
                   {overdue > 0 && (
-                    <div className="flex items-center gap-1.5 text-destructive">
-                      <AlertTriangle className="w-4 h-4" />
+                    <div className="flex items-center gap-1 text-destructive">
+                      <AlertTriangle className="w-3.5 h-3.5" />
                       <span className="text-sm font-bold">{overdue}</span>
                     </div>
                   )}
-                  <div className="flex items-center gap-1.5 text-warning">
-                    <Clock className="w-4 h-4" />
+                  <div className="flex items-center gap-1 text-warning">
+                    <Clock className="w-3.5 h-3.5" />
                     <span className="text-sm font-bold">{pending + inProgress}</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-success">
-                    <CheckCircle2 className="w-4 h-4" />
+                  <div className="flex items-center gap-1 text-success">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
                     <span className="text-sm font-bold">{completed}</span>
                   </div>
                 </div>
 
                 {/* Progress Bar */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Produtividade</span>
-                    <span className="font-bold text-foreground">{productivity}%</span>
+                    <span className="font-bold">{productivity}%</span>
                   </div>
-                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                  <div className="progress-bar">
                     <div 
-                      className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500"
+                      className="progress-fill"
                       style={{ width: `${productivity}%` }}
                     />
                   </div>
@@ -167,10 +161,10 @@ export default function Team() {
 
                 {/* Contact Icons */}
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
-                  <Button variant="ghost" size="sm" className="rounded-lg hover:bg-primary/10 hover:text-primary">
+                  <Button variant="ghost" size="sm" className="h-8 hover:text-primary">
                     <Mail className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="rounded-lg hover:bg-primary/10 hover:text-primary">
+                  <Button variant="ghost" size="sm" className="h-8 hover:text-primary">
                     <Phone className="w-4 h-4" />
                   </Button>
                 </div>

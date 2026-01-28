@@ -1,25 +1,44 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import { CircularGauge } from '@/components/ui/CircularGauge';
-import { ProgressBar } from '@/components/ui/ProgressBar';
 import { 
   Users, 
   AlertTriangle, 
   Gavel, 
   TrendingUp,
   DollarSign,
-  UserPlus,
   ArrowUpRight,
+  ArrowDownRight,
   Clock,
   CheckCircle2,
   FileText,
-  Target
+  Target,
+  BarChart3,
 } from 'lucide-react';
 import { mockDashboardMetrics, mockTasks, mockLeads, mockCourtNotifications, mockClients, mockTeamMembers, mockPayments } from '@/data/mockData';
 import { cn } from '@/lib/utils';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+
+const revenueData = [
+  { month: 'Jan', value: 45000 },
+  { month: 'Fev', value: 52000 },
+  { month: 'Mar', value: 48000 },
+  { month: 'Abr', value: 61000 },
+  { month: 'Mai', value: 55000 },
+  { month: 'Jun', value: 67000 },
+  { month: 'Jul', value: 72000 },
+];
+
+const leadsData = [
+  { name: 'Seg', leads: 12, converted: 8 },
+  { name: 'Ter', leads: 19, converted: 14 },
+  { name: 'Qua', leads: 15, converted: 10 },
+  { name: 'Qui', leads: 22, converted: 16 },
+  { name: 'Sex', leads: 18, converted: 12 },
+  { name: 'Sáb', leads: 8, converted: 5 },
+  { name: 'Dom', leads: 4, converted: 2 },
+];
 
 export default function Dashboard() {
   const overdueTasks = mockTasks.filter(t => t.status === 'overdue');
-  const pendingTasks = mockTasks.filter(t => t.status === 'pending' || t.status === 'in_progress');
   const pendingNotifications = mockCourtNotifications.filter(n => n.status === 'pending');
   const completedTasks = mockTasks.filter(t => t.status === 'completed');
   
@@ -40,194 +59,195 @@ export default function Dashboard() {
     }).format(value);
   };
 
-  const taskCompletionRate = Math.round((completedTasks.length / mockTasks.length) * 100);
-  const conversionRate = mockDashboardMetrics.conversionRate;
-
   return (
-    <MainLayout title="Dashboard" subtitle="Visão geral do escritório">
+    <MainLayout title="Dashboard" subtitle="LexFlow">
       <div className="space-y-6 animate-fade-in">
-        {/* Top Row - Key Metrics with Gauges */}
-        <div className="grid gap-4 grid-cols-1 lg:grid-cols-4">
-          {/* Main Revenue Card with Gauge */}
-          <div className="lg:col-span-2 metric-card metric-card-highlight glow-primary p-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="p-2 rounded-xl"
-                    style={{
-                      background: 'linear-gradient(135deg, hsl(36, 100%, 50% / 0.2) 0%, hsl(36, 100%, 50% / 0.05) 100%)',
+        {/* Top Row - Key Metrics */}
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+          {/* Revenue */}
+          <div className="metric-card metric-card-primary">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Receita Mensal</span>
+              <div className="p-1.5 rounded-lg bg-primary/20">
+                <DollarSign className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+            <p className="metric-number-blue">{formatCurrency(mockDashboardMetrics.monthlyRevenue)}</p>
+            <div className="flex items-center gap-1 mt-2 text-success text-xs font-medium">
+              <ArrowUpRight className="w-3 h-3" />
+              <span>12.5%</span>
+              <span className="text-muted-foreground">vs mês anterior</span>
+            </div>
+          </div>
+
+          {/* Pending */}
+          <div className="metric-card">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">A Receber</span>
+              <div className="p-1.5 rounded-lg bg-warning/20">
+                <Clock className="w-4 h-4 text-warning" />
+              </div>
+            </div>
+            <p className="metric-number">{formatCurrency(totalPending)}</p>
+            <div className="flex items-center gap-1 mt-2 text-warning text-xs font-medium">
+              <span>8 parcelas pendentes</span>
+            </div>
+          </div>
+
+          {/* Active Clients */}
+          <div className="metric-card">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Clientes Ativos</span>
+              <div className="p-1.5 rounded-lg bg-primary/20">
+                <Users className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+            <p className="metric-number">{mockDashboardMetrics.activeClients}</p>
+            <div className="flex items-center gap-1 mt-2 text-success text-xs font-medium">
+              <ArrowUpRight className="w-3 h-3" />
+              <span>+8 este mês</span>
+            </div>
+          </div>
+
+          {/* Leads */}
+          <div className="metric-card">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Novos Leads</span>
+              <div className="p-1.5 rounded-lg bg-primary/20">
+                <Target className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+            <p className="metric-number">{mockDashboardMetrics.totalLeads}</p>
+            <div className="flex items-center gap-1 mt-2 text-muted-foreground text-xs font-medium">
+              <span>Taxa de conversão: {mockDashboardMetrics.conversionRate}%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Charts Row */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          {/* Revenue Chart */}
+          <div className="lg:col-span-2 dashboard-card">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-base font-semibold text-foreground">Receita</h3>
+                <p className="text-xs text-muted-foreground">Últimos 7 meses</p>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="flex items-center gap-1">
+                  <span className="w-3 h-3 rounded bg-primary" />
+                  <span className="text-muted-foreground">Receita</span>
+                </span>
+              </div>
+            </div>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={revenueData}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(217, 91%, 60%)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="hsl(217, 91%, 60%)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" vertical={false} />
+                  <XAxis 
+                    dataKey="month" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(217, 20%, 50%)', fontSize: 12 }}
+                  />
+                  <YAxis 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(217, 20%, 50%)', fontSize: 12 }}
+                    tickFormatter={(value) => `${value/1000}k`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      background: 'hsl(222, 47%, 11%)', 
+                      border: '1px solid hsl(222, 30%, 18%)',
+                      borderRadius: '8px',
+                      color: 'hsl(210, 40%, 98%)'
                     }}
-                  >
-                    <DollarSign className="w-5 h-5 text-primary" />
-                  </div>
-                  <span className="text-sm text-muted-foreground">Receita do Mês</span>
-                </div>
-                <p className="metric-number-gold">{formatCurrency(mockDashboardMetrics.monthlyRevenue)}</p>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 text-success text-sm font-semibold">
-                    <ArrowUpRight className="w-4 h-4" />
-                    <span>+12%</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">vs. mês anterior</span>
-                </div>
-              </div>
-              <CircularGauge
-                value={75}
-                max={100}
-                size={140}
-                label="75%"
-                sublabel="da meta"
-                variant="primary"
-              />
+                    formatter={(value: number) => [formatCurrency(value), 'Receita']}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="hsl(217, 91%, 60%)" 
+                    strokeWidth={2}
+                    fillOpacity={1} 
+                    fill="url(#colorRevenue)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Conversion Rate */}
-          <div className="metric-card p-6">
-            <div className="flex flex-col items-center text-center">
-              <CircularGauge
-                value={conversionRate}
-                max={100}
-                size={100}
-                label={`${conversionRate}%`}
-                sublabel=""
-                variant="success"
-              />
-              <div className="mt-4">
-                <p className="text-sm font-medium text-foreground">Taxa de Conversão</p>
-                <p className="text-xs text-muted-foreground">Leads → Clientes</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Task Completion */}
-          <div className="metric-card p-6">
-            <div className="flex flex-col items-center text-center">
-              <CircularGauge
-                value={taskCompletionRate}
-                max={100}
-                size={100}
-                label={`${taskCompletionRate}%`}
-                sublabel=""
-                variant="primary"
-              />
-              <div className="mt-4">
-                <p className="text-sm font-medium text-foreground">Tarefas Concluídas</p>
+          {/* Leads Chart */}
+          <div className="dashboard-card">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-base font-semibold text-foreground">Leads</h3>
                 <p className="text-xs text-muted-foreground">Esta semana</p>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Second Row - Quick Stats */}
-        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-          {/* A Receber */}
-          <div className="metric-card metric-card-warning p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div 
-                className="p-2 rounded-xl"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(36, 100%, 50% / 0.2) 0%, hsl(36, 100%, 50% / 0.05) 100%)',
-                }}
-              >
-                <Clock className="w-5 h-5 text-warning" />
-              </div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">A Receber</span>
-            </div>
-            <p className="text-3xl font-bold text-foreground">{formatCurrency(totalPending)}</p>
-          </div>
-
-          {/* Clientes Ativos */}
-          <div className="metric-card p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div 
-                className="p-2 rounded-xl"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(36, 100%, 50% / 0.2) 0%, hsl(36, 100%, 50% / 0.05) 100%)',
-                }}
-              >
-                <Users className="w-5 h-5 text-primary" />
-              </div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Clientes</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-foreground">{mockDashboardMetrics.activeClients}</p>
-              <div className="flex items-center gap-1 text-success text-xs font-semibold">
-                <UserPlus className="w-3 h-3" />
-                <span>+8</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Novos Leads */}
-          <div className="metric-card p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div 
-                className="p-2 rounded-xl"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(36, 100%, 50% / 0.2) 0%, hsl(36, 100%, 50% / 0.05) 100%)',
-                }}
-              >
-                <Target className="w-5 h-5 text-primary" />
-              </div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Novos Leads</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-foreground">{mockDashboardMetrics.totalLeads}</p>
-              <span className="text-xs text-muted-foreground">este mês</span>
-            </div>
-          </div>
-
-          {/* Contratos */}
-          <div className="metric-card p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div 
-                className="p-2 rounded-xl"
-                style={{
-                  background: 'linear-gradient(135deg, hsl(36, 100%, 50% / 0.2) 0%, hsl(36, 100%, 50% / 0.05) 100%)',
-                }}
-              >
-                <FileText className="w-5 h-5 text-primary" />
-              </div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Contratos</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-foreground">23</p>
-              <span className="text-xs text-success font-medium">5 novos</span>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={leadsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 30%, 18%)" vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(217, 20%, 50%)', fontSize: 12 }}
+                  />
+                  <YAxis 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(217, 20%, 50%)', fontSize: 12 }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      background: 'hsl(222, 47%, 11%)', 
+                      border: '1px solid hsl(222, 30%, 18%)',
+                      borderRadius: '8px',
+                      color: 'hsl(210, 40%, 98%)'
+                    }}
+                  />
+                  <Bar dataKey="leads" fill="hsl(217, 91%, 60%)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="converted" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
 
-        {/* Third Row - Alerts */}
+        {/* Alerts Row */}
         <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-          {/* Tarefas Atrasadas */}
+          {/* Overdue Tasks */}
           <div className={cn(
-            "metric-card p-5",
+            "metric-card",
             overdueTasks.length > 0 && "metric-card-danger"
           )}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div 
-                  className="p-2 rounded-xl"
-                  style={{
-                    background: overdueTasks.length > 0 
-                      ? 'linear-gradient(135deg, hsl(0, 72%, 51% / 0.2) 0%, hsl(0, 72%, 51% / 0.05) 100%)'
-                      : 'linear-gradient(135deg, hsl(30, 15%, 15% / 0.5) 0%, hsl(30, 15%, 10% / 0.5) 100%)',
-                  }}
-                >
+                <div className={cn(
+                  "p-2 rounded-lg",
+                  overdueTasks.length > 0 ? "bg-destructive/20" : "bg-muted"
+                )}>
                   <AlertTriangle className={cn(
-                    "w-5 h-5",
+                    "w-4 h-4",
                     overdueTasks.length > 0 ? "text-destructive" : "text-muted-foreground"
                   )} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground text-sm">Tarefas Atrasadas</p>
+                  <p className="font-semibold text-sm">Tarefas Atrasadas</p>
                   <p className="text-xs text-muted-foreground">Requer atenção</p>
                 </div>
               </div>
               <p className={cn(
-                "text-3xl font-bold",
+                "text-2xl font-bold",
                 overdueTasks.length > 0 ? "text-destructive" : "text-muted-foreground"
               )}>
                 {overdueTasks.length}
@@ -236,42 +256,38 @@ export default function Dashboard() {
             {overdueTasks.length > 0 && (
               <div className="space-y-2">
                 {overdueTasks.slice(0, 2).map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-2 rounded-lg bg-background/50">
-                    <span className="text-xs truncate flex-1">{task.title}</span>
-                    <span className="text-xs text-destructive font-medium ml-2">Atrasada</span>
+                  <div key={task.id} className="flex items-center justify-between p-2 rounded-lg bg-background/50 text-xs">
+                    <span className="truncate flex-1">{task.title}</span>
+                    <span className="text-destructive font-medium ml-2">Atrasada</span>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Novas Intimações */}
+          {/* Court Notifications */}
           <div className={cn(
-            "metric-card p-5",
+            "metric-card",
             pendingNotifications.length > 0 && "metric-card-warning"
           )}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div 
-                  className="p-2 rounded-xl"
-                  style={{
-                    background: pendingNotifications.length > 0
-                      ? 'linear-gradient(135deg, hsl(36, 100%, 50% / 0.2) 0%, hsl(36, 100%, 50% / 0.05) 100%)'
-                      : 'linear-gradient(135deg, hsl(30, 15%, 15% / 0.5) 0%, hsl(30, 15%, 10% / 0.5) 100%)',
-                  }}
-                >
+                <div className={cn(
+                  "p-2 rounded-lg",
+                  pendingNotifications.length > 0 ? "bg-warning/20" : "bg-muted"
+                )}>
                   <Gavel className={cn(
-                    "w-5 h-5",
+                    "w-4 h-4",
                     pendingNotifications.length > 0 ? "text-warning" : "text-muted-foreground"
                   )} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground text-sm">Novas Intimações</p>
+                  <p className="font-semibold text-sm">Novas Intimações</p>
                   <p className="text-xs text-muted-foreground">Aguardando análise</p>
                 </div>
               </div>
               <p className={cn(
-                "text-3xl font-bold",
+                "text-2xl font-bold",
                 pendingNotifications.length > 0 ? "text-warning" : "text-muted-foreground"
               )}>
                 {pendingNotifications.length}
@@ -280,83 +296,63 @@ export default function Dashboard() {
             {pendingNotifications.length > 0 && (
               <div className="space-y-2">
                 {pendingNotifications.slice(0, 2).map((notif) => (
-                  <div key={notif.id} className="flex items-center justify-between p-2 rounded-lg bg-background/50">
-                    <span className="text-xs truncate flex-1">{notif.type}</span>
-                    <span className="text-xs text-warning font-medium ml-2">Nova</span>
+                  <div key={notif.id} className="flex items-center justify-between p-2 rounded-lg bg-background/50 text-xs">
+                    <span className="truncate flex-1">{notif.type}</span>
+                    <span className="text-warning font-medium ml-2">Nova</span>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Tarefas Pendentes */}
-          <div className="metric-card p-5">
+          {/* Contracts */}
+          <div className="metric-card">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div 
-                  className="p-2 rounded-xl"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(36, 100%, 50% / 0.2) 0%, hsl(36, 100%, 50% / 0.05) 100%)',
-                  }}
-                >
-                  <CheckCircle2 className="w-5 h-5 text-primary" />
+                <div className="p-2 rounded-lg bg-success/20">
+                  <FileText className="w-4 h-4 text-success" />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground text-sm">Tarefas Pendentes</p>
-                  <p className="text-xs text-muted-foreground">Em andamento</p>
+                  <p className="font-semibold text-sm">Contratos</p>
+                  <p className="text-xs text-muted-foreground">Este mês</p>
                 </div>
               </div>
-              <p className="text-3xl font-bold text-foreground">
-                {pendingTasks.length}
-              </p>
+              <p className="text-2xl font-bold text-success">23</p>
             </div>
-            <div className="flex items-center gap-4 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary" />
-                <span className="text-muted-foreground">Em progresso: {mockTasks.filter(t => t.status === 'in_progress').length}</span>
-              </div>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <span>5 novos contratos</span>
+              <span className="text-success font-medium">+18%</span>
             </div>
           </div>
         </div>
 
-        {/* Fourth Row - Team & Clients */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        {/* Bottom Row - Team & Clients */}
+        <div className="grid gap-4 lg:grid-cols-2">
           {/* Team Performance */}
-          <div className="metric-card p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-foreground">Produtividade da Equipe</h3>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Esta semana</span>
+          <div className="dashboard-card">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-base font-semibold">Equipe</h3>
+              <a href="/team" className="text-xs text-primary hover:underline">Ver todos</a>
             </div>
-            <div className="space-y-5">
-              {mockTeamMembers.filter(m => m.status === 'active').slice(0, 5).map((member) => {
-                const memberTasks = mockTasks.filter(t => t.assignedTo === member.id);
+            <div className="space-y-4">
+              {mockTeamMembers.filter(m => m.status === 'active').slice(0, 4).map((member) => {
                 const completed = member.tasksCompleted;
-                const pending = memberTasks.filter(t => t.status !== 'completed').length;
-                const overdue = memberTasks.filter(t => t.status === 'overdue').length;
+                const pending = member.tasksPending;
                 const progress = completed / (completed + pending) * 100 || 0;
 
                 return (
-                  <div key={member.id} className="flex items-center gap-4">
-                    <div 
-                      className="flex items-center justify-center w-10 h-10 rounded-xl font-bold text-sm"
-                      style={{
-                        background: 'linear-gradient(135deg, hsl(36, 100%, 50% / 0.2) 0%, hsl(25, 80%, 45% / 0.1) 100%)',
-                        color: 'hsl(36, 100%, 55%)',
-                      }}
-                    >
+                  <div key={member.id} className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-9 h-9 rounded-lg font-semibold text-xs bg-primary/20 text-primary">
                       {member.avatar}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between mb-1.5">
                         <p className="text-sm font-medium truncate">{member.name}</p>
-                        <div className="flex items-center gap-3 text-xs">
-                          {overdue > 0 && (
-                            <span className="text-destructive font-semibold">{overdue} atrasada</span>
-                          )}
-                          <span className="text-muted-foreground">{completed} concluídas</span>
-                        </div>
+                        <span className="text-xs text-muted-foreground">{completed} tarefas</span>
                       </div>
-                      <ProgressBar value={progress} max={100} variant="primary" size="sm" />
+                      <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: `${progress}%` }} />
+                      </div>
                     </div>
                   </div>
                 );
@@ -365,28 +361,19 @@ export default function Dashboard() {
           </div>
 
           {/* Recent Clients */}
-          <div className="metric-card p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-foreground">Clientes Recentes</h3>
-              <a href="/clients" className="text-sm text-primary hover:underline">Ver todos</a>
+          <div className="dashboard-card">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-base font-semibold">Clientes Recentes</h3>
+              <a href="/clients" className="text-xs text-primary hover:underline">Ver todos</a>
             </div>
             <div className="space-y-3">
-              {mockClients.slice(0, 5).map((client) => (
+              {mockClients.slice(0, 4).map((client) => (
                 <div 
                   key={client.id} 
-                  className="flex items-center justify-between p-3 rounded-xl transition-colors cursor-pointer hover:bg-secondary/50"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(20 14% 10%) 0%, hsl(20 14% 8%) 100%)',
-                  }}
+                  className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div 
-                      className="flex items-center justify-center w-10 h-10 rounded-xl font-bold text-sm"
-                      style={{
-                        background: 'linear-gradient(135deg, hsl(36, 100%, 50% / 0.2) 0%, hsl(25, 80%, 45% / 0.1) 100%)',
-                        color: 'hsl(36, 100%, 55%)',
-                      }}
-                    >
+                    <div className="flex items-center justify-center w-9 h-9 rounded-lg font-semibold text-xs bg-primary/20 text-primary">
                       {client.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                     </div>
                     <div>
@@ -394,14 +381,14 @@ export default function Dashboard() {
                       <p className="text-xs text-muted-foreground">{client.email}</p>
                     </div>
                   </div>
-                  <div className={cn(
-                    "px-3 py-1 rounded-full text-xs font-semibold",
+                  <span className={cn(
+                    "px-2 py-1 rounded-full text-xs font-medium",
                     client.status === 'active' 
                       ? "bg-success/20 text-success" 
                       : "bg-muted text-muted-foreground"
                   )}>
                     {client.status === 'active' ? 'Ativo' : 'Inativo'}
-                  </div>
+                  </span>
                 </div>
               ))}
             </div>
