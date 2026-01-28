@@ -20,7 +20,6 @@ import {
   CheckCircle2,
   Clock,
   MoreHorizontal,
-  DollarSign,
   ArrowUpRight,
 } from 'lucide-react';
 import {
@@ -30,6 +29,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 export default function Financial() {
   const getClientName = (clientId: string) => {
@@ -66,72 +67,72 @@ export default function Financial() {
   };
 
   return (
-    <MainLayout title="Financeiro" subtitle="Gestão de receitas e cobranças">
+    <MainLayout title="Financeiro" subtitle="Gestão">
       <div className="space-y-6">
         {/* Big Number Metrics */}
         <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-          <div className="metric-card metric-card-highlight glow-primary p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-xl bg-primary/20">
-                <TrendingUp className="w-6 h-6 text-primary" />
-              </div>
-              <div className="flex items-center gap-1 text-success text-sm font-semibold">
-                <ArrowUpRight className="w-4 h-4" />
-                <span>+15%</span>
+          <div className="metric-card metric-card-primary">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Receita do Mês</span>
+              <div className="p-1.5 rounded-lg bg-primary/20">
+                <TrendingUp className="w-4 h-4 text-primary" />
               </div>
             </div>
-            <p className="text-4xl font-bold text-foreground mb-1">
+            <p className="text-2xl font-bold text-primary">
               {formatCurrency(mockDashboardMetrics.monthlyRevenue)}
             </p>
-            <p className="text-sm text-muted-foreground">Receita do mês</p>
+            <div className="flex items-center gap-1 mt-2 text-success text-xs font-medium">
+              <ArrowUpRight className="w-3 h-3" />
+              <span>+15%</span>
+            </div>
           </div>
 
-          <div className="metric-card metric-card-success p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-xl bg-success/20">
-                <CheckCircle2 className="w-6 h-6 text-success" />
+          <div className="metric-card metric-card-success">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Recebido</span>
+              <div className="p-1.5 rounded-lg bg-success/20">
+                <CheckCircle2 className="w-4 h-4 text-success" />
               </div>
             </div>
-            <p className="text-4xl font-bold text-success mb-1">
+            <p className="text-2xl font-bold text-success">
               {formatCurrency(totalReceived)}
             </p>
-            <p className="text-sm text-muted-foreground">Recebido</p>
           </div>
 
-          <div className="metric-card metric-card-warning p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-xl bg-warning/20">
-                <Clock className="w-6 h-6 text-warning" />
+          <div className="metric-card metric-card-warning">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">A Receber</span>
+              <div className="p-1.5 rounded-lg bg-warning/20">
+                <Clock className="w-4 h-4 text-warning" />
               </div>
             </div>
-            <p className="text-4xl font-bold text-warning mb-1">
+            <p className="text-2xl font-bold text-warning">
               {formatCurrency(totalPending)}
             </p>
-            <p className="text-sm text-muted-foreground">A receber</p>
           </div>
 
           <div className={cn(
-            "metric-card p-6",
-            totalOverdue > 0 && "metric-card-danger glow-danger"
+            "metric-card",
+            totalOverdue > 0 && "metric-card-danger"
           )}>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Em Atraso</span>
               <div className={cn(
-                "p-3 rounded-xl",
-                totalOverdue > 0 ? "bg-destructive/20" : "bg-secondary"
+                "p-1.5 rounded-lg",
+                totalOverdue > 0 ? "bg-destructive/20" : "bg-muted"
               )}>
                 <AlertTriangle className={cn(
-                  "w-6 h-6",
+                  "w-4 h-4",
                   totalOverdue > 0 ? "text-destructive" : "text-muted-foreground"
                 )} />
               </div>
             </div>
             <p className={cn(
-              "text-4xl font-bold mb-1",
+              "text-2xl font-bold",
               totalOverdue > 0 ? "text-destructive" : "text-foreground"
             )}>
               {formatCurrency(totalOverdue)}
             </p>
-            <p className="text-sm text-muted-foreground">Em atraso</p>
           </div>
         </div>
 
@@ -142,15 +143,15 @@ export default function Financial() {
             <Input
               type="search"
               placeholder="Buscar pagamentos..."
-              className="pl-9 bg-secondary border-0 rounded-xl"
+              className="pl-9"
             />
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" className="gap-2 rounded-xl">
+            <Button variant="outline" className="gap-2 text-sm">
               <Download className="w-4 h-4" />
               Exportar
             </Button>
-            <Button className="gap-2 bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20">
+            <Button className="gap-2 bg-primary hover:bg-primary/90 text-sm">
               <Plus className="w-4 h-4" />
               Nova Cobrança
             </Button>
@@ -162,13 +163,13 @@ export default function Financial() {
           <Table>
             <TableHeader>
               <TableRow className="data-table-header hover:bg-transparent">
-                <TableHead>Cliente</TableHead>
-                <TableHead>Valor</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Vencimento</TableHead>
-                <TableHead>Pagamento</TableHead>
-                <TableHead>Método</TableHead>
-                <TableHead className="w-[60px]"></TableHead>
+                <TableHead className="text-xs">Cliente</TableHead>
+                <TableHead className="text-xs">Valor</TableHead>
+                <TableHead className="text-xs">Status</TableHead>
+                <TableHead className="text-xs">Vencimento</TableHead>
+                <TableHead className="text-xs">Pagamento</TableHead>
+                <TableHead className="text-xs">Método</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -178,56 +179,47 @@ export default function Financial() {
 
                 return (
                   <TableRow key={payment.id} className="data-table-row">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-secondary">
-                          <DollarSign className="w-4 h-4 text-primary" />
-                        </div>
-                        <span className="font-medium text-foreground">
-                          {getClientName(payment.clientId)}
-                        </span>
-                      </div>
+                    <TableCell className="font-medium text-sm">
+                      {getClientName(payment.clientId)}
+                    </TableCell>
+                    <TableCell className="font-semibold text-sm">
+                      {formatCurrency(payment.amount)}
                     </TableCell>
                     <TableCell>
-                      <span className="text-lg font-bold text-foreground">
-                        {formatCurrency(payment.amount)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={cn("gap-1.5 rounded-lg", status.color)}>
+                      <Badge className={cn("gap-1 text-xs", status.color)}>
                         <StatusIcon className="w-3 h-3" />
                         {status.label}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(payment.dueDate).toLocaleDateString('pt-BR')}
+                    <TableCell className="text-sm text-muted-foreground">
+                      {format(payment.dueDate, "dd/MM/yyyy", { locale: ptBR })}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="text-sm text-muted-foreground">
                       {payment.paidAt
-                        ? new Date(payment.paidAt).toLocaleDateString('pt-BR')
+                        ? format(payment.paidAt, "dd/MM/yyyy", { locale: ptBR })
                         : '-'}
                     </TableCell>
                     <TableCell>
                       {payment.method ? (
-                        <Badge variant="outline" className="capitalize rounded-lg">
+                        <Badge variant="outline" className="capitalize text-xs">
                           {payment.method}
                         </Badge>
                       ) : (
-                        <span className="text-muted-foreground">-</span>
+                        <span className="text-muted-foreground text-sm">-</span>
                       )}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-secondary">
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
                             <MoreHorizontal className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-popover border-border rounded-xl">
-                          <DropdownMenuItem className="rounded-lg cursor-pointer">Ver detalhes</DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-lg cursor-pointer">Enviar lembrete</DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-lg cursor-pointer">Marcar como pago</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive rounded-lg cursor-pointer">
+                        <DropdownMenuContent align="end" className="bg-popover border-border">
+                          <DropdownMenuItem className="text-sm">Ver detalhes</DropdownMenuItem>
+                          <DropdownMenuItem className="text-sm">Enviar lembrete</DropdownMenuItem>
+                          <DropdownMenuItem className="text-sm">Marcar como pago</DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive text-sm">
                             Cancelar
                           </DropdownMenuItem>
                         </DropdownMenuContent>

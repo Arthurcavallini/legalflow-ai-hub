@@ -13,9 +13,9 @@ import {
 
 const columns = [
   { id: 'new', label: 'Novos', color: 'bg-primary' },
-  { id: 'qualified', label: 'Qualificados', color: 'bg-success' },
-  { id: 'proposal', label: 'Proposta Enviada', color: 'bg-warning' },
-  { id: 'negotiation', label: 'Em Negociação', color: 'bg-purple-500' },
+  { id: 'qualified', label: 'Qualificados', color: 'bg-cyan-500' },
+  { id: 'proposal', label: 'Proposta', color: 'bg-warning' },
+  { id: 'negotiation', label: 'Negociação', color: 'bg-purple-500' },
   { id: 'closed', label: 'Fechados', color: 'bg-success' },
 ];
 
@@ -35,33 +35,33 @@ function LeadCard({ lead }: { lead: Lead }) {
   return (
     <div
       className={cn(
-        'kanban-card border-l-4 animate-fade-in',
+        'kanban-card border-l-4',
         urgencyStyles[lead.urgency]
       )}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center flex-shrink-0">
-            <span className="text-sm font-bold text-primary">
+          <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-bold text-primary">
               {lead.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
             </span>
           </div>
           <div>
-            <p className="font-semibold text-sm text-foreground">{lead.name}</p>
+            <p className="font-semibold text-sm">{lead.name}</p>
             <p className="text-xs text-muted-foreground">{lead.caseType}</p>
           </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-secondary">
+            <Button variant="ghost" size="icon" className="h-7 w-7">
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-popover border-border rounded-xl">
-            <DropdownMenuItem className="rounded-lg cursor-pointer">Ver detalhes</DropdownMenuItem>
-            <DropdownMenuItem className="rounded-lg cursor-pointer">Editar</DropdownMenuItem>
-            <DropdownMenuItem className="rounded-lg cursor-pointer">Mover para...</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive rounded-lg cursor-pointer">Arquivar</DropdownMenuItem>
+          <DropdownMenuContent align="end" className="bg-popover border-border">
+            <DropdownMenuItem className="text-sm">Ver detalhes</DropdownMenuItem>
+            <DropdownMenuItem className="text-sm">Editar</DropdownMenuItem>
+            <DropdownMenuItem className="text-sm">Mover para...</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive text-sm">Arquivar</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -72,35 +72,35 @@ function LeadCard({ lead }: { lead: Lead }) {
         </p>
       )}
 
-      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
+      <div className="flex items-center gap-2 text-xs mb-3">
         {lead.source === 'whatsapp' && (
-          <Badge className="bg-success/20 text-success text-xs rounded-lg">
+          <Badge className="bg-success/20 text-success text-[10px]">
             <MessageSquare className="w-3 h-3 mr-1" />
             WhatsApp
           </Badge>
         )}
-        <Badge variant="outline" className={cn("text-xs rounded-lg", urgencyLabels[lead.urgency].color)}>
+        <Badge className={cn("text-[10px]", urgencyLabels[lead.urgency].color)}>
           {urgencyLabels[lead.urgency].label}
         </Badge>
       </div>
 
       <div className="flex items-center justify-between pt-3 border-t border-border">
-        <div className="flex items-center gap-1.5">
-          <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-primary/10 hover:text-primary">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-primary">
             <Phone className="w-3.5 h-3.5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg hover:bg-primary/10 hover:text-primary">
+          <Button variant="ghost" size="icon" className="h-7 w-7 hover:text-primary">
             <MessageSquare className="w-3.5 h-3.5" />
           </Button>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-12 h-2 rounded-full bg-secondary overflow-hidden">
+          <div className="w-12 h-1.5 rounded-full bg-border overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all"
+              className="h-full bg-primary rounded-full transition-all"
               style={{ width: `${lead.probability}%` }}
             />
           </div>
-          <span className="text-xs font-bold text-foreground">{lead.probability}%</span>
+          <span className="text-xs font-bold">{lead.probability}%</span>
         </div>
       </div>
 
@@ -121,13 +121,13 @@ export function KanbanBoard() {
       {columns.map((column) => {
         const leads = getLeadsByStatus(column.id);
         return (
-          <div key={column.id} className="kanban-column min-w-[320px] flex-shrink-0">
+          <div key={column.id} className="kanban-column min-w-[300px] flex-shrink-0">
             <div className="flex items-center justify-between mb-4 px-1">
               <div className="flex items-center gap-2">
-                <span className={cn('w-3 h-3 rounded-full', column.color)} />
-                <h3 className="font-semibold text-sm text-foreground">{column.label}</h3>
+                <span className={cn('w-2.5 h-2.5 rounded-full', column.color)} />
+                <h3 className="font-semibold text-sm">{column.label}</h3>
               </div>
-              <Badge variant="outline" className="text-xs font-bold rounded-lg">
+              <Badge variant="outline" className="text-xs font-semibold">
                 {leads.length}
               </Badge>
             </div>
@@ -136,7 +136,7 @@ export function KanbanBoard() {
                 <LeadCard key={lead.id} lead={lead} />
               ))}
               {leads.length === 0 && (
-                <div className="flex items-center justify-center h-32 border-2 border-dashed border-border rounded-xl text-sm text-muted-foreground">
+                <div className="flex items-center justify-center h-32 border-2 border-dashed border-border rounded-lg text-xs text-muted-foreground">
                   Nenhum lead
                 </div>
               )}
