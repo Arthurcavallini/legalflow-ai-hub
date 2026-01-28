@@ -250,7 +250,7 @@ export default function Team() {
                     </div>
                     <div className="bg-secondary/50 rounded-lg p-3 text-center">
                       <p className="text-xl font-bold text-foreground">{member.avgExecutionTime}d</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">Média</p>
+                      <p className="text-[10px] text-muted-foreground uppercase leading-tight">Tempo/Tarefa</p>
                     </div>
                   </div>
                 </div>
@@ -349,40 +349,80 @@ export default function Team() {
                 </TabsList>
 
                 <TabsContent value="info" className="space-y-6 mt-0">
+                  {/* Status Control */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-foreground mb-3">Status do Membro</h4>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant={selectedMember.status === 'active' ? 'default' : 'outline'}
+                        size="sm"
+                        className={cn(
+                          "flex-1",
+                          selectedMember.status === 'active' && "bg-success hover:bg-success/90"
+                        )}
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                        Ativo
+                      </Button>
+                      <Button 
+                        variant={selectedMember.status === 'vacation' ? 'default' : 'outline'}
+                        size="sm"
+                        className={cn(
+                          "flex-1",
+                          selectedMember.status === 'vacation' && "bg-warning hover:bg-warning/90 text-warning-foreground"
+                        )}
+                      >
+                        <Calendar className="w-4 h-4 mr-1.5" />
+                        Férias
+                      </Button>
+                      <Button 
+                        variant={selectedMember.status !== 'active' && selectedMember.status !== 'vacation' ? 'default' : 'outline'}
+                        size="sm"
+                        className={cn(
+                          "flex-1",
+                          selectedMember.status !== 'active' && selectedMember.status !== 'vacation' && "bg-muted-foreground hover:bg-muted-foreground/90"
+                        )}
+                      >
+                        <AlertTriangle className="w-4 h-4 mr-1.5" />
+                        Inativo
+                      </Button>
+                    </div>
+                  </div>
+
                   {/* Personal Info */}
                   <div>
                     <h4 className="text-sm font-semibold text-foreground mb-4">Dados Pessoais</h4>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
+                        <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                         <div className="min-w-0">
                           <p className="text-[10px] text-muted-foreground uppercase">Email</p>
                           <p className="text-sm font-medium truncate">{selectedMember.personalInfo.email}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <Phone className="w-4 h-4 text-muted-foreground" />
+                        <Phone className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                         <div>
                           <p className="text-[10px] text-muted-foreground uppercase">Telefone</p>
                           <p className="text-sm font-medium">{selectedMember.personalInfo.phone}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <Building className="w-4 h-4 text-muted-foreground" />
+                        <Building className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                         <div>
                           <p className="text-[10px] text-muted-foreground uppercase">Departamento</p>
                           <p className="text-sm font-medium">{selectedMember.personalInfo.department}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                        <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                         <div>
                           <p className="text-[10px] text-muted-foreground uppercase">Localização</p>
                           <p className="text-sm font-medium">{selectedMember.personalInfo.location}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <Calendar className="w-4 h-4 text-muted-foreground" />
+                        <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                         <div>
                           <p className="text-[10px] text-muted-foreground uppercase">Data de Início</p>
                           <p className="text-sm font-medium">
@@ -391,7 +431,7 @@ export default function Team() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-secondary/40 rounded-xl">
-                        <User className="w-4 h-4 text-muted-foreground" />
+                        <User className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                         <div>
                           <p className="text-[10px] text-muted-foreground uppercase">Gestor</p>
                           <p className="text-sm font-medium">{selectedMember.personalInfo.manager}</p>
