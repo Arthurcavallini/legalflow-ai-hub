@@ -23,26 +23,25 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const productionColumns = [
-  { id: 'pending', label: 'Pendentes', icon: Clock },
-  { id: 'in_progress', label: 'Em Andamento', icon: Calendar },
-  { id: 'completed', label: 'Concluídas', icon: CheckCircle2 },
-  { id: 'overdue', label: 'Atrasadas', icon: AlertTriangle },
+  { id: 'pending', label: 'Pendentes', icon: Clock, color: 'text-primary' },
+  { id: 'in_progress', label: 'Em Andamento', icon: Calendar, color: 'text-warning' },
+  { id: 'completed', label: 'Concluídas', icon: CheckCircle2, color: 'text-success' },
+  { id: 'overdue', label: 'Atrasadas', icon: AlertTriangle, color: 'text-destructive' },
 ];
 
 function TaskCard({ task }: { task: typeof mockTasks[0] }) {
   const client = mockClients.find((c) => c.id === task.clientId);
-  const process = mockProcesses.find((p) => p.id === task.processId);
 
   const priorityStyles = {
     high: 'border-l-destructive',
-    medium: 'border-l-amber-500',
-    low: 'border-l-blue-500',
+    medium: 'border-l-warning',
+    low: 'border-l-primary',
   };
 
   const priorityBadge = {
-    high: { label: 'Alta', variant: 'destructive' as const },
-    medium: { label: 'Média', variant: 'secondary' as const },
-    low: { label: 'Baixa', variant: 'outline' as const },
+    high: { label: 'Alta', color: 'bg-destructive/10 text-destructive border-destructive/20' },
+    medium: { label: 'Média', color: 'bg-warning/10 text-warning border-warning/20' },
+    low: { label: 'Baixa', color: 'bg-primary/10 text-primary border-primary/20' },
   };
 
   return (
@@ -88,7 +87,7 @@ function TaskCard({ task }: { task: typeof mockTasks[0] }) {
       )}
 
       <div className="flex items-center justify-between pt-3 border-t border-border">
-        <Badge variant={priorityBadge[task.priority].variant} className="text-xs">
+        <Badge variant="outline" className={cn("text-xs border", priorityBadge[task.priority].color)}>
           {priorityBadge[task.priority].label}
         </Badge>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -114,20 +113,20 @@ export default function Production() {
       <div className="space-y-6">
         {/* Actions Bar */}
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          <div className="flex gap-3">
-            <div className="relative flex-1 sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="flex gap-2">
+            <div className="relative flex-1 sm:w-64">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Buscar tarefas..."
-                className="pl-9"
+                className="pl-8 h-9"
               />
             </div>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon" className="h-9 w-9">
               <Filter className="w-4 h-4" />
             </Button>
           </div>
-          <Button className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground">
+          <Button size="sm" className="gap-1.5 h-9 bg-primary hover:bg-primary/90">
             <Plus className="w-4 h-4" />
             Nova Tarefa
           </Button>
@@ -141,22 +140,14 @@ export default function Production() {
             return (
               <div
                 key={column.id}
-                className="kanban-column min-w-[300px] flex-shrink-0"
+                className="min-w-[300px] flex-shrink-0 bg-secondary/30 rounded-xl p-4 border border-border"
               >
-                <div className="flex items-center justify-between mb-3 px-1">
+                <div className="flex items-center justify-between mb-4 px-1">
                   <div className="flex items-center gap-2">
-                    <Icon
-                      className={cn(
-                        'w-4 h-4',
-                        column.id === 'overdue' && 'text-destructive',
-                        column.id === 'completed' && 'text-accent',
-                        column.id === 'in_progress' && 'text-amber-500',
-                        column.id === 'pending' && 'text-blue-500'
-                      )}
-                    />
+                    <Icon className={cn('w-4 h-4', column.color)} />
                     <h3 className="font-medium text-sm">{column.label}</h3>
                   </div>
-                  <span className="text-xs font-medium text-muted-foreground bg-background px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-medium text-muted-foreground bg-card px-2 py-0.5 rounded-full border border-border">
                     {tasks.length}
                   </span>
                 </div>

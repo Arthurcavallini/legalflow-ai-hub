@@ -34,12 +34,12 @@ export default function Services() {
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      'Trabalhista': 'bg-primary/20 text-primary',
-      'Previdenciário': 'bg-purple-500/20 text-purple-400',
-      'Família': 'bg-pink-500/20 text-pink-400',
-      'Consumidor': 'bg-success/20 text-success',
+      'Trabalhista': 'bg-primary/10 text-primary border-primary/20',
+      'Previdenciário': 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+      'Família': 'bg-pink-500/10 text-pink-600 border-pink-500/20',
+      'Consumidor': 'bg-success/10 text-success border-success/20',
     };
-    return colors[category] || 'bg-muted text-muted-foreground';
+    return colors[category] || 'bg-muted text-muted-foreground border-border';
   };
 
   const formatCurrency = (value: number) => {
@@ -56,23 +56,23 @@ export default function Services() {
       <div className="space-y-6">
         {/* Summary Cards */}
         <div className="grid gap-4 md:grid-cols-4">
-          <div className="metric-card">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Total de Serviços</span>
-            <p className="text-3xl font-bold mt-2">{mockServices.length}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Total de Serviços</span>
+            <p className="text-2xl font-bold mt-1">{mockServices.length}</p>
           </div>
-          <div className="metric-card">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Categorias</span>
-            <p className="text-3xl font-bold mt-2">{categories.length}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Categorias</span>
+            <p className="text-2xl font-bold mt-1">{categories.length}</p>
           </div>
-          <div className="metric-card metric-card-primary">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Preço Médio</span>
-            <p className="text-3xl font-bold mt-2 text-primary">
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Preço Médio</span>
+            <p className="text-2xl font-bold mt-1 text-primary">
               {formatCurrency(Math.round(mockServices.reduce((sum, s) => sum + s.basePrice, 0) / mockServices.length))}
             </p>
           </div>
-          <div className="metric-card">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Mais Caro</span>
-            <p className="text-3xl font-bold mt-2">
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Mais Caro</span>
+            <p className="text-2xl font-bold mt-1">
               {formatCurrency(Math.max(...mockServices.map(s => s.basePrice)))}
             </p>
           </div>
@@ -80,16 +80,16 @@ export default function Services() {
 
         {/* Actions Bar */}
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          <div className="flex gap-3">
-            <div className="relative flex-1 sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input type="search" placeholder="Buscar serviços..." className="pl-9 rounded-xl" />
+          <div className="flex gap-2">
+            <div className="relative flex-1 sm:w-64">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input type="search" placeholder="Buscar serviços..." className="pl-8 h-9" />
             </div>
-            <Button variant="outline" size="icon" className="rounded-xl">
+            <Button variant="outline" size="icon" className="h-9 w-9">
               <Filter className="w-4 h-4" />
             </Button>
           </div>
-          <Button className="gap-2 bg-primary hover:bg-primary/90 text-sm rounded-xl shadow-lg shadow-primary/20">
+          <Button size="sm" className="gap-1.5 h-9 bg-primary hover:bg-primary/90">
             <Plus className="w-4 h-4" />
             Novo Serviço
           </Button>
@@ -99,35 +99,35 @@ export default function Services() {
         <div className="dashboard-card p-0 overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-xs">Serviço</TableHead>
-                <TableHead className="text-xs">Descrição</TableHead>
-                <TableHead className="text-xs">Categoria</TableHead>
-                <TableHead className="text-xs text-right">Preço Base</TableHead>
-                <TableHead className="w-[80px]"></TableHead>
+              <TableRow className="bg-secondary/30 hover:bg-secondary/30">
+                <TableHead className="text-xs font-medium">Serviço</TableHead>
+                <TableHead className="text-xs font-medium">Descrição</TableHead>
+                <TableHead className="text-xs font-medium">Categoria</TableHead>
+                <TableHead className="text-xs font-medium text-right">Preço Base</TableHead>
+                <TableHead className="w-10"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {mockServices.map((service) => (
-                <TableRow key={service.id} className="hover:bg-secondary/30 cursor-pointer">
+                <TableRow key={service.id} className="hover:bg-secondary/30">
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/20">
+                      <div className="p-2 rounded-lg bg-primary/10">
                         <Package className="w-4 h-4 text-primary" />
                       </div>
-                      <span className="font-medium text-sm">{service.name}</span>
+                      <span className="font-medium">{service.name}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-xs truncate">
+                  <TableCell className="text-muted-foreground max-w-xs truncate">
                     {service.description}
                   </TableCell>
                   <TableCell>
-                    <Badge className={cn('font-normal text-xs', getCategoryColor(service.category))}>
+                    <Badge variant="outline" className={cn('font-normal text-xs border', getCategoryColor(service.category))}>
                       {service.category}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <span className="font-bold text-primary">{formatCurrency(service.basePrice)}</span>
+                    <span className="font-semibold text-primary">{formatCurrency(service.basePrice)}</span>
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -136,16 +136,16 @@ export default function Services() {
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-popover border-border">
-                        <DropdownMenuItem className="gap-2 text-sm">
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem className="gap-2">
                           <Eye className="w-3.5 h-3.5" />
                           Visualizar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 text-sm">
+                        <DropdownMenuItem className="gap-2">
                           <Edit className="w-3.5 h-3.5" />
                           Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 text-sm text-destructive">
+                        <DropdownMenuItem className="gap-2 text-destructive">
                           <Trash2 className="w-3.5 h-3.5" />
                           Excluir
                         </DropdownMenuItem>

@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Select,
   SelectContent,
@@ -31,11 +30,8 @@ import {
   Calendar as CalendarIcon,
   Clock,
   User,
-  MapPin,
-  Bell,
-  Video,
-  Phone,
   AlertCircle,
+  Video,
 } from 'lucide-react';
 
 export default function CalendarPage() {
@@ -93,9 +89,9 @@ export default function CalendarPage() {
   const today = new Date();
 
   const eventTypeConfig = {
-    hearing: { label: 'Audiência', color: 'bg-destructive', textColor: 'text-destructive', bgLight: 'bg-destructive/20', icon: AlertCircle },
-    deadline: { label: 'Prazo', color: 'bg-warning', textColor: 'text-warning', bgLight: 'bg-warning/20', icon: Clock },
-    meeting: { label: 'Reunião', color: 'bg-primary', textColor: 'text-primary', bgLight: 'bg-primary/20', icon: Video },
+    hearing: { label: 'Audiência', color: 'bg-destructive', textColor: 'text-destructive', bgLight: 'bg-destructive/10', icon: AlertCircle },
+    deadline: { label: 'Prazo', color: 'bg-warning', textColor: 'text-warning', bgLight: 'bg-warning/10', icon: Clock },
+    meeting: { label: 'Reunião', color: 'bg-primary', textColor: 'text-primary', bgLight: 'bg-primary/10', icon: Video },
   };
 
   const upcomingEvents = mockCalendarEvents
@@ -119,21 +115,21 @@ export default function CalendarPage() {
       <div className="space-y-6">
         {/* Stats Row */}
         <div className="grid gap-4 md:grid-cols-4">
-          <div className="metric-card">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Eventos este mês</span>
-            <p className="text-3xl font-bold mt-2">{thisMonthEvents.length}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Eventos este mês</span>
+            <p className="text-2xl font-bold mt-1">{thisMonthEvents.length}</p>
           </div>
-          <div className="metric-card metric-card-danger">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Audiências</span>
-            <p className="text-3xl font-bold mt-2 text-destructive">{hearingsCount}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Audiências</span>
+            <p className="text-2xl font-bold mt-1 text-destructive">{hearingsCount}</p>
           </div>
-          <div className="metric-card metric-card-warning">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Prazos</span>
-            <p className="text-3xl font-bold mt-2 text-warning">{deadlinesCount}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Prazos</span>
+            <p className="text-2xl font-bold mt-1 text-warning">{deadlinesCount}</p>
           </div>
-          <div className="metric-card metric-card-primary">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Reuniões</span>
-            <p className="text-3xl font-bold mt-2 text-primary">{meetingsCount}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Reuniões</span>
+            <p className="text-2xl font-bold mt-1 text-primary">{meetingsCount}</p>
           </div>
         </div>
 
@@ -142,28 +138,28 @@ export default function CalendarPage() {
           <div className="lg:col-span-3 dashboard-card">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <h2 className="text-xl font-bold text-foreground">
+                <h2 className="text-lg font-bold text-foreground">
                   {months[currentDate.getMonth()]} {currentDate.getFullYear()}
                 </h2>
-                <Button variant="outline" size="sm" onClick={goToToday} className="rounded-xl text-xs">
+                <Button variant="outline" size="sm" onClick={goToToday} className="h-8 text-xs">
                   Hoje
                 </Button>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="icon" onClick={() => navigateMonth('prev')} className="rounded-xl">
+                <Button variant="outline" size="icon" onClick={() => navigateMonth('prev')} className="h-8 w-8">
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
-                <Button variant="outline" size="icon" onClick={() => navigateMonth('next')} className="rounded-xl">
+                <Button variant="outline" size="icon" onClick={() => navigateMonth('next')} className="h-8 w-8">
                   <ChevronRight className="w-4 h-4" />
                 </Button>
                 <Dialog open={newEventOpen} onOpenChange={setNewEventOpen}>
                   <DialogTrigger asChild>
-                    <Button className="ml-2 gap-2 bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20">
+                    <Button size="sm" className="ml-2 gap-1.5 h-8 bg-primary hover:bg-primary/90">
                       <Plus className="w-4 h-4" />
                       Novo Evento
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-card border-border sm:max-w-lg">
+                  <DialogContent className="sm:max-w-lg">
                     <DialogHeader>
                       <DialogTitle>Criar Novo Evento</DialogTitle>
                       <DialogDescription>
@@ -173,16 +169,16 @@ export default function CalendarPage() {
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
                         <Label>Título do Evento</Label>
-                        <Input placeholder="Ex: Audiência trabalhista" className="rounded-xl" />
+                        <Input placeholder="Ex: Audiência trabalhista" className="h-9" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label>Tipo</Label>
                           <Select>
-                            <SelectTrigger className="rounded-xl">
+                            <SelectTrigger className="h-9">
                               <SelectValue placeholder="Selecione" />
                             </SelectTrigger>
-                            <SelectContent className="bg-popover border-border">
+                            <SelectContent>
                               <SelectItem value="hearing">Audiência</SelectItem>
                               <SelectItem value="deadline">Prazo</SelectItem>
                               <SelectItem value="meeting">Reunião</SelectItem>
@@ -192,10 +188,10 @@ export default function CalendarPage() {
                         <div className="space-y-2">
                           <Label>Cliente</Label>
                           <Select>
-                            <SelectTrigger className="rounded-xl">
+                            <SelectTrigger className="h-9">
                               <SelectValue placeholder="Selecione" />
                             </SelectTrigger>
-                            <SelectContent className="bg-popover border-border">
+                            <SelectContent>
                               {mockClients.map(client => (
                                 <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
                               ))}
@@ -206,27 +202,27 @@ export default function CalendarPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label>Data</Label>
-                          <Input type="date" className="rounded-xl" />
+                          <Input type="date" className="h-9" />
                         </div>
                         <div className="space-y-2">
                           <Label>Horário</Label>
-                          <Input type="time" className="rounded-xl" />
+                          <Input type="time" className="h-9" />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <Label>Local</Label>
-                        <Input placeholder="Ex: Vara do Trabalho, Sala 201" className="rounded-xl" />
+                        <Input placeholder="Ex: Vara do Trabalho, Sala 201" className="h-9" />
                       </div>
                       <div className="space-y-2">
                         <Label>Observações</Label>
-                        <Textarea placeholder="Notas adicionais..." className="rounded-xl min-h-[80px]" />
+                        <Textarea placeholder="Notas adicionais..." className="min-h-[80px]" />
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setNewEventOpen(false)} className="rounded-xl">
+                      <Button variant="outline" onClick={() => setNewEventOpen(false)}>
                         Cancelar
                       </Button>
-                      <Button className="bg-primary hover:bg-primary/90 rounded-xl">
+                      <Button className="bg-primary hover:bg-primary/90">
                         Criar Evento
                       </Button>
                     </DialogFooter>
@@ -238,7 +234,7 @@ export default function CalendarPage() {
             {/* Days of week header */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {daysOfWeek.map(day => (
-                <div key={day} className="text-center text-sm font-semibold text-muted-foreground py-3">
+                <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
                   {day}
                 </div>
               ))}
@@ -256,9 +252,9 @@ export default function CalendarPage() {
                     key={index}
                     onClick={() => day && setSelectedDate(day)}
                     className={cn(
-                      'min-h-[100px] p-2 rounded-xl border transition-all cursor-pointer',
+                      'min-h-[90px] p-2 rounded-lg border transition-all cursor-pointer',
                       day ? 'hover:border-primary/50' : 'cursor-default',
-                      isToday && 'bg-primary/10 border-primary/50',
+                      isToday && 'bg-primary/5 border-primary/50',
                       isSelected && !isToday && 'border-primary bg-primary/5',
                       !isToday && !isSelected && 'border-transparent hover:bg-secondary/50'
                     )}
@@ -267,7 +263,7 @@ export default function CalendarPage() {
                       <>
                         <div className="flex items-center justify-between mb-1">
                           <p className={cn(
-                            'text-sm font-semibold',
+                            'text-sm font-medium',
                             isToday ? 'text-primary' : 'text-foreground'
                           )}>
                             {day.getDate()}
@@ -285,7 +281,7 @@ export default function CalendarPage() {
                               <div
                                 key={event.id}
                                 className={cn(
-                                  'text-xs px-2 py-1 rounded-lg truncate font-medium',
+                                  'text-[10px] px-1.5 py-0.5 rounded truncate font-medium',
                                   config.bgLight,
                                   config.textColor
                                 )}
@@ -295,7 +291,7 @@ export default function CalendarPage() {
                             );
                           })}
                           {events.length > 2 && (
-                            <p className="text-xs text-primary font-medium text-center">
+                            <p className="text-[10px] text-primary font-medium text-center">
                               +{events.length - 2}
                             </p>
                           )}
@@ -313,7 +309,7 @@ export default function CalendarPage() {
             {/* Selected Date Events */}
             {selectedDate && (
               <div className="dashboard-card">
-                <h3 className="font-bold text-foreground mb-4">
+                <h3 className="font-semibold text-sm text-foreground mb-4">
                   {selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </h3>
                 {selectedDateEvents.length > 0 ? (
@@ -329,16 +325,16 @@ export default function CalendarPage() {
                       return (
                         <div
                           key={event.id}
-                          className={cn("p-3 rounded-xl border-l-4", config.bgLight)}
+                          className={cn("p-3 rounded-lg border-l-4", config.bgLight)}
                           style={{ borderLeftColor: `hsl(var(--${config.color.replace('bg-', '')}))` }}
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <EventIcon className={cn("w-4 h-4", config.textColor)} />
-                            <Badge className={cn('text-xs', config.bgLight, config.textColor)}>
+                            <Badge variant="outline" className={cn('text-xs border', config.bgLight, config.textColor)}>
                               {config.label}
                             </Badge>
                           </div>
-                          <p className="font-semibold text-sm">{event.title}</p>
+                          <p className="font-medium text-sm">{event.title}</p>
                           {clientName && (
                             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                               <User className="w-3 h-3" />
@@ -364,7 +360,7 @@ export default function CalendarPage() {
 
             {/* Upcoming Events */}
             <div className="dashboard-card">
-              <h3 className="font-bold text-foreground mb-4">Próximos Eventos</h3>
+              <h3 className="font-semibold text-sm text-foreground mb-4">Próximos Eventos</h3>
               <div className="space-y-3">
                 {upcomingEvents.map(event => {
                   const config = eventTypeConfig[event.type as keyof typeof eventTypeConfig];
@@ -374,7 +370,7 @@ export default function CalendarPage() {
                   return (
                     <div
                       key={event.id}
-                      className="p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
+                      className="p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
                     >
                       <div className="flex items-start gap-3">
                         <div className={cn('p-2 rounded-lg', config.bgLight)}>
@@ -397,19 +393,6 @@ export default function CalendarPage() {
                     </div>
                   );
                 })}
-              </div>
-            </div>
-
-            {/* Legend */}
-            <div className="dashboard-card">
-              <h3 className="font-bold text-foreground mb-4">Legenda</h3>
-              <div className="space-y-3">
-                {Object.entries(eventTypeConfig).map(([key, config]) => (
-                  <div key={key} className="flex items-center gap-3">
-                    <span className={cn('w-3 h-3 rounded-full', config.color)} />
-                    <span className="text-sm text-foreground">{config.label}</span>
-                  </div>
-                ))}
               </div>
             </div>
           </div>

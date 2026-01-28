@@ -72,11 +72,11 @@ export default function Contracts() {
   };
 
   const statusConfig = {
-    draft: { label: 'Rascunho', variant: 'secondary' as const, icon: FileText, color: 'bg-muted text-muted-foreground' },
-    pending_signature: { label: 'Aguardando Assinatura', variant: 'outline' as const, icon: Clock, color: 'bg-warning/20 text-warning' },
-    active: { label: 'Ativo', variant: 'default' as const, icon: CheckCircle2, color: 'bg-success/20 text-success' },
-    completed: { label: 'Concluído', variant: 'secondary' as const, icon: CheckCircle2, color: 'bg-primary/20 text-primary' },
-    cancelled: { label: 'Cancelado', variant: 'destructive' as const, icon: XCircle, color: 'bg-destructive/20 text-destructive' },
+    draft: { label: 'Rascunho', icon: FileText, color: 'bg-muted text-muted-foreground border-border' },
+    pending_signature: { label: 'Aguardando', icon: Clock, color: 'bg-warning/10 text-warning border-warning/20' },
+    active: { label: 'Ativo', icon: CheckCircle2, color: 'bg-success/10 text-success border-success/20' },
+    completed: { label: 'Concluído', icon: CheckCircle2, color: 'bg-primary/10 text-primary border-primary/20' },
+    cancelled: { label: 'Cancelado', icon: XCircle, color: 'bg-destructive/10 text-destructive border-destructive/20' },
   };
 
   const totalValue = mockContracts.reduce((sum, c) => sum + c.value, 0);
@@ -96,66 +96,66 @@ export default function Contracts() {
       <div className="space-y-6">
         {/* Summary Cards */}
         <div className="grid gap-4 md:grid-cols-4">
-          <div className="metric-card">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Total de Contratos</span>
-            <p className="text-3xl font-bold mt-2">{mockContracts.length}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Total de Contratos</span>
+            <p className="text-2xl font-bold mt-1">{mockContracts.length}</p>
           </div>
-          <div className="metric-card metric-card-success">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Ativos</span>
-            <p className="text-3xl font-bold mt-2 text-success">{activeContracts}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Ativos</span>
+            <p className="text-2xl font-bold mt-1 text-success">{activeContracts}</p>
           </div>
-          <div className="metric-card metric-card-warning">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Rascunhos</span>
-            <p className="text-3xl font-bold mt-2 text-warning">
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Rascunhos</span>
+            <p className="text-2xl font-bold mt-1 text-warning">
               {mockContracts.filter(c => c.status === 'draft').length}
             </p>
           </div>
-          <div className="metric-card metric-card-primary">
-            <span className="text-xs text-muted-foreground uppercase tracking-wide">Valor Total</span>
-            <p className="text-3xl font-bold mt-2 text-primary">{formatCurrency(totalValue)}</p>
+          <div className="dashboard-card">
+            <span className="text-sm text-muted-foreground">Valor Total</span>
+            <p className="text-2xl font-bold mt-1 text-primary">{formatCurrency(totalValue)}</p>
           </div>
         </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <div className="flex items-center justify-between">
-            <TabsList className="bg-secondary/50 rounded-xl p-1">
-              <TabsTrigger value="contracts" className="rounded-lg data-[state=active]:bg-card gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <TabsList className="bg-secondary rounded-lg p-1">
+              <TabsTrigger value="contracts" className="rounded-md data-[state=active]:bg-card gap-1.5">
                 <FileText className="w-4 h-4" />
                 Contratos
               </TabsTrigger>
-              <TabsTrigger value="templates" className="rounded-lg data-[state=active]:bg-card gap-2">
+              <TabsTrigger value="templates" className="rounded-md data-[state=active]:bg-card gap-1.5">
                 <FileSignature className="w-4 h-4" />
                 Modelos
               </TabsTrigger>
             </TabsList>
 
-            <div className="flex gap-3">
-              <div className="relative w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input type="search" placeholder="Buscar..." className="pl-9 rounded-xl" />
+            <div className="flex gap-2">
+              <div className="relative w-64">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input type="search" placeholder="Buscar..." className="pl-8 h-9" />
               </div>
-              <Button variant="outline" size="icon" className="rounded-xl">
+              <Button variant="outline" size="icon" className="h-9 w-9">
                 <Filter className="w-4 h-4" />
               </Button>
-              <Button variant="outline" className="gap-2 rounded-xl">
+              <Button variant="outline" size="sm" className="gap-1.5 h-9">
                 <Download className="w-4 h-4" />
                 Exportar
               </Button>
               {activeTab === 'contracts' ? (
-                <Button className="gap-2 bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20">
+                <Button size="sm" className="gap-1.5 h-9 bg-primary hover:bg-primary/90">
                   <Plus className="w-4 h-4" />
                   Novo Contrato
                 </Button>
               ) : (
                 <Dialog open={newTemplateOpen} onOpenChange={setNewTemplateOpen}>
                   <DialogTrigger asChild>
-                    <Button className="gap-2 bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20">
+                    <Button size="sm" className="gap-1.5 h-9 bg-primary hover:bg-primary/90">
                       <Plus className="w-4 h-4" />
                       Novo Modelo
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-card border-border">
+                  <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Criar Novo Modelo</DialogTitle>
                       <DialogDescription>
@@ -165,22 +165,22 @@ export default function Contracts() {
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
                         <Label>Nome do Modelo</Label>
-                        <Input placeholder="Ex: Contrato de Honorários" className="rounded-xl" />
+                        <Input placeholder="Ex: Contrato de Honorários" className="h-9" />
                       </div>
                       <div className="space-y-2">
                         <Label>Categoria</Label>
-                        <Input placeholder="Ex: Trabalhista, Geral, Empresarial" className="rounded-xl" />
+                        <Input placeholder="Ex: Trabalhista, Geral, Empresarial" className="h-9" />
                       </div>
                       <div className="space-y-2">
                         <Label>Descrição</Label>
-                        <Textarea placeholder="Descreva o propósito deste modelo..." className="rounded-xl min-h-[100px]" />
+                        <Textarea placeholder="Descreva o propósito deste modelo..." className="min-h-[100px]" />
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setNewTemplateOpen(false)} className="rounded-xl">
+                      <Button variant="outline" onClick={() => setNewTemplateOpen(false)}>
                         Cancelar
                       </Button>
-                      <Button className="bg-primary hover:bg-primary/90 rounded-xl">
+                      <Button className="bg-primary hover:bg-primary/90">
                         Criar Modelo
                       </Button>
                     </DialogFooter>
@@ -195,13 +195,13 @@ export default function Contracts() {
             <div className="dashboard-card p-0 overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-xs">Cliente</TableHead>
-                    <TableHead className="text-xs">Serviço</TableHead>
-                    <TableHead className="text-xs">Valor</TableHead>
-                    <TableHead className="text-xs">Status</TableHead>
-                    <TableHead className="text-xs">Criado em</TableHead>
-                    <TableHead className="text-xs">Assinado em</TableHead>
+                  <TableRow className="bg-secondary/30 hover:bg-secondary/30">
+                    <TableHead className="text-xs font-medium">Cliente</TableHead>
+                    <TableHead className="text-xs font-medium">Serviço</TableHead>
+                    <TableHead className="text-xs font-medium">Valor</TableHead>
+                    <TableHead className="text-xs font-medium">Status</TableHead>
+                    <TableHead className="text-xs font-medium">Criado em</TableHead>
+                    <TableHead className="text-xs font-medium">Assinado em</TableHead>
                     <TableHead className="w-[80px]"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -211,27 +211,27 @@ export default function Contracts() {
                     const StatusIcon = status.icon;
 
                     return (
-                      <TableRow key={contract.id} className="cursor-pointer hover:bg-secondary/30">
-                        <TableCell className="font-medium text-sm">
+                      <TableRow key={contract.id} className="hover:bg-secondary/30">
+                        <TableCell className="font-medium">
                           {getClientName(contract.clientId)}
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{getServiceName(contract.serviceId)}</TableCell>
+                        <TableCell className="text-muted-foreground">{getServiceName(contract.serviceId)}</TableCell>
                         <TableCell>
-                          <span className="font-semibold text-sm">{formatCurrency(contract.value)}</span>
+                          <span className="font-semibold">{formatCurrency(contract.value)}</span>
                         </TableCell>
                         <TableCell>
-                          <Badge className={cn("gap-1 text-xs", status.color)}>
+                          <Badge variant="outline" className={cn("gap-1 text-xs border", status.color)}>
                             <StatusIcon className="w-3 h-3" />
                             {status.label}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
+                        <TableCell className="text-muted-foreground">
                           {new Date(contract.createdAt).toLocaleDateString('pt-BR')}
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
+                        <TableCell className="text-muted-foreground">
                           {contract.signedAt
                             ? new Date(contract.signedAt).toLocaleDateString('pt-BR')
-                            : '-'}
+                            : '—'}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
@@ -244,12 +244,12 @@ export default function Contracts() {
                                   <MoreHorizontal className="w-4 h-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="bg-popover border-border">
-                                <DropdownMenuItem className="text-sm">Visualizar</DropdownMenuItem>
-                                <DropdownMenuItem className="text-sm">Editar</DropdownMenuItem>
-                                <DropdownMenuItem className="text-sm">Enviar para assinatura</DropdownMenuItem>
-                                <DropdownMenuItem className="text-sm">Gerar PDF</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive text-sm">Cancelar</DropdownMenuItem>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>Visualizar</DropdownMenuItem>
+                                <DropdownMenuItem>Editar</DropdownMenuItem>
+                                <DropdownMenuItem>Enviar para assinatura</DropdownMenuItem>
+                                <DropdownMenuItem>Gerar PDF</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive">Cancelar</DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
@@ -266,9 +266,9 @@ export default function Contracts() {
           <TabsContent value="templates" className="mt-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {mockTemplates.map((template) => (
-                <div key={template.id} className="dashboard-card hover:border-primary/30 transition-colors cursor-pointer">
+                <div key={template.id} className="dashboard-card cursor-pointer">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-primary/20">
+                    <div className="p-2.5 rounded-lg bg-primary/10">
                       <FileSignature className="w-5 h-5 text-primary" />
                     </div>
                     <DropdownMenu>
@@ -277,20 +277,20 @@ export default function Contracts() {
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-popover border-border">
-                        <DropdownMenuItem className="gap-2 text-sm">
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem className="gap-2">
                           <Eye className="w-3.5 h-3.5" />
                           Visualizar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 text-sm">
+                        <DropdownMenuItem className="gap-2">
                           <Edit className="w-3.5 h-3.5" />
                           Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 text-sm">
+                        <DropdownMenuItem className="gap-2">
                           <Copy className="w-3.5 h-3.5" />
                           Duplicar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2 text-sm text-destructive">
+                        <DropdownMenuItem className="gap-2 text-destructive">
                           <Trash2 className="w-3.5 h-3.5" />
                           Excluir
                         </DropdownMenuItem>
@@ -314,10 +314,10 @@ export default function Contracts() {
 
               {/* Add Template Card */}
               <div 
-                className="dashboard-card border-dashed hover:border-primary/50 transition-colors cursor-pointer flex flex-col items-center justify-center text-center min-h-[200px]"
+                className="dashboard-card border-dashed cursor-pointer flex flex-col items-center justify-center text-center min-h-[180px]"
                 onClick={() => setNewTemplateOpen(true)}
               >
-                <div className="p-3 rounded-xl bg-secondary/50 mb-3">
+                <div className="p-2.5 rounded-lg bg-secondary mb-3">
                   <Plus className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <p className="text-sm font-medium">Adicionar Modelo</p>
