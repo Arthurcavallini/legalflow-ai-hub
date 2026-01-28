@@ -1,4 +1,4 @@
-import { Bell, Plus } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -69,13 +69,6 @@ export function Header({ title, subtitle }: HeaderProps) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        {/* Quick Action */}
-        <Button size="sm" className="gap-1.5 h-8 bg-primary hover:bg-primary/90 rounded-lg text-xs font-medium">
-          <Plus className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Novo</span>
-        </Button>
-
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
