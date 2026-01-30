@@ -3,7 +3,6 @@ import { mockPayments, mockClients, mockDashboardMetrics } from '@/data/mockData
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -22,8 +21,6 @@ import {
   Clock,
   MoreHorizontal,
   ArrowUpRight,
-  ArrowDownRight,
-  Filter,
   Calendar,
 } from 'lucide-react';
 import {
@@ -42,7 +39,7 @@ import {
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useState } from 'react';
 
 const cashFlowData = [
@@ -68,7 +65,6 @@ const paymentMethodData = [
 ];
 
 export default function Financial() {
-  const [activeTab, setActiveTab] = useState('analytics');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPeriod, setFilterPeriod] = useState('all');
 
@@ -165,19 +161,88 @@ export default function Financial() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-secondary rounded-lg p-1">
-            <TabsTrigger value="analytics" className="rounded-md data-[state=active]:bg-card">
-              Análises
-            </TabsTrigger>
-            <TabsTrigger value="transactions" className="rounded-md data-[state=active]:bg-card">
-              Transações
-            </TabsTrigger>
-          </TabsList>
+        {/* Analytics Section */}
+        <div className="space-y-6">
+          {/* Charts Row */}
+          <div className="grid gap-6 lg:grid-cols-4">
+            {/* Cash Flow Area Chart */}
+            <div className="lg:col-span-3 dashboard-card">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="font-semibold">Fluxo de Caixa</h3>
+                  <p className="text-sm text-muted-foreground">Entradas vs Saídas - 12 meses</p>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-primary" />
+                    <span className="text-muted-foreground">Entradas</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-destructive/70" />
+                    <span className="text-muted-foreground">Saídas</span>
+                  </span>
+                </div>
+              </div>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={cashFlowData}>
+                    <defs>
+                      <linearGradient id="colorEntrada" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorSaida" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} tickFormatter={(value) => `${value/1000}k`} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        background: 'hsl(var(--popover))', 
+                        border: '1px solid hsl(var(--border))', 
+                        borderRadius: '8px',
+                        color: 'hsl(var(--popover-foreground))'
+                      }}
+                      formatter={(value: number, name: string) => [formatCurrency(value), name === 'entrada' ? 'Entradas' : 'Saídas']}
+                    />
+                    <Area type="monotone" dataKey="entrada" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={1} fill="url(#colorEntrada)" />
+                    <Area type="monotone" dataKey="saida" stroke="hsl(var(--destructive))" strokeWidth={2} fillOpacity={1} fill="url(#colorSaida)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
 
-          {/* Transactions Tab */}
-          <TabsContent value="transactions" className="mt-6 space-y-4">
+            {/* Payment Methods */}
+            <div className="dashboard-card">
+              <h3 className="font-semibold mb-1">Métodos de Pagamento</h3>
+              <p className="text-sm text-muted-foreground mb-6">Distribuição por método</p>
+              <div className="space-y-4">
+                {paymentMethodData.map((item, index) => {
+                  const colors = ['bg-primary', 'bg-success', 'bg-warning', 'bg-chart-2'];
+                  return (
+                    <div key={item.name} className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-foreground">{item.name}</span>
+                        <span className="font-semibold">{item.value}%</span>
+                      </div>
+                      <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                        <div 
+                          className={cn("h-full rounded-full transition-all", colors[index])}
+                          style={{ width: `${item.value}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Transactions Section */}
+          <div className="space-y-4">
             {/* Filter Bar + Actions */}
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
               <div className="flex flex-wrap gap-3 items-center">
@@ -290,130 +355,8 @@ export default function Financial() {
                 <Button variant="outline" size="sm">Próximo</Button>
               </div>
             </div>
-          </TabsContent>
-
-          {/* Analytics Tab */}
-          <TabsContent value="analytics" className="mt-6 space-y-6">
-            {/* Charts Row */}
-            <div className="grid gap-6 lg:grid-cols-4">
-              {/* Cash Flow Area Chart */}
-              <div className="lg:col-span-3 dashboard-card">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="font-semibold">Fluxo de Caixa</h3>
-                    <p className="text-sm text-muted-foreground">Entradas vs Saídas - 12 meses</p>
-                  </div>
-                  <div className="flex items-center gap-4 text-xs">
-                    <span className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded bg-primary" />
-                      <span className="text-muted-foreground">Entradas</span>
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded bg-destructive/70" />
-                      <span className="text-muted-foreground">Saídas</span>
-                    </span>
-                  </div>
-                </div>
-                <div className="h-72">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={cashFlowData}>
-                      <defs>
-                        <linearGradient id="colorEntrada" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                        </linearGradient>
-                        <linearGradient id="colorSaida" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} tickFormatter={(value) => `${value/1000}k`} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          background: 'hsl(var(--popover))', 
-                          border: '1px solid hsl(var(--border))', 
-                          borderRadius: '8px',
-                          color: 'hsl(var(--popover-foreground))'
-                        }}
-                        formatter={(value: number, name: string) => [formatCurrency(value), name === 'entrada' ? 'Entradas' : 'Saídas']}
-                      />
-                      <Area type="monotone" dataKey="entrada" stroke="hsl(var(--primary))" strokeWidth={2} fillOpacity={1} fill="url(#colorEntrada)" />
-                      <Area type="monotone" dataKey="saida" stroke="hsl(var(--destructive))" strokeWidth={2} fillOpacity={1} fill="url(#colorSaida)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* Payment Methods */}
-              <div className="dashboard-card">
-                <h3 className="font-semibold mb-1">Métodos de Pagamento</h3>
-                <p className="text-sm text-muted-foreground mb-6">Distribuição por método</p>
-                <div className="space-y-4">
-                  {paymentMethodData.map((item, index) => {
-                    const colors = ['bg-primary', 'bg-success', 'bg-warning', 'bg-chart-2'];
-                    return (
-                      <div key={item.name} className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-foreground">{item.name}</span>
-                          <span className="font-semibold">{item.value}%</span>
-                        </div>
-                        <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                          <div 
-                            className={cn("h-full rounded-full transition-all", colors[index])}
-                            style={{ width: `${item.value}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Combined Bar Chart - Full Width */}
-            <div className="dashboard-card">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="font-semibold">Receitas vs Despesas</h3>
-                  <p className="text-sm text-muted-foreground">Comparativo mensal - 12 meses</p>
-                </div>
-                <div className="flex items-center gap-4 text-xs">
-                  <span className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded bg-primary" />
-                    <span className="text-muted-foreground">Receitas</span>
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded bg-destructive" />
-                    <span className="text-muted-foreground">Despesas</span>
-                  </span>
-                </div>
-              </div>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={cashFlowData} barGap={-1} barCategoryGap="35%">
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} tickFormatter={(value) => `${value/1000}k`} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        background: 'hsl(var(--popover))', 
-                        border: '1px solid hsl(var(--border))', 
-                        borderRadius: '8px',
-                        color: 'hsl(var(--popover-foreground))'
-                      }}
-                      formatter={(value: number, name: string) => [formatCurrency(value), name === 'entrada' ? 'Receita' : 'Despesa']}
-                    />
-                    <Bar dataKey="entrada" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} maxBarSize={24} />
-                    <Bar dataKey="saida" fill="hsl(var(--destructive))" radius={[3, 3, 0, 0]} maxBarSize={24} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </TabsContent>
-
-        </Tabs>
+          </div>
+        </div>
       </div>
     </MainLayout>
   );
