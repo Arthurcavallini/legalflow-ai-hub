@@ -344,16 +344,16 @@ export default function Dashboard() {
               icon={TrendingUp}
               trend={{ value: 12.5, isPositive: true }}
               trendLabel="vs mês anterior"
-              iconColor="text-primary"
-              iconBg="bg-primary/10"
+              iconColor="text-emerald-500"
+              iconBg="bg-emerald-500/10"
             />
             <StatCard
               label="A Receber"
               value={formatCurrency(pendingAmount)}
               icon={Wallet}
               trendLabel="8 parcelas pendentes"
-              iconColor="text-warning"
-              iconBg="bg-warning/10"
+              iconColor="text-amber-500"
+              iconBg="bg-amber-500/10"
             />
             <StatCard
               label="Despesas do Mês"
@@ -361,8 +361,8 @@ export default function Dashboard() {
               icon={BarChart3}
               trend={{ value: 5, isPositive: false }}
               trendLabel="vs mês anterior"
-              iconColor="text-destructive"
-              iconBg="bg-destructive/10"
+              iconColor="text-rose-500"
+              iconBg="bg-rose-500/10"
             />
           </div>
         </div>
