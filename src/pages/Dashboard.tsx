@@ -367,55 +367,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Team Performance */}
-        <div className="bg-card rounded-2xl border border-border p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-lg font-semibold text-foreground">Desempenho da Equipe</h3>
-              <p className="text-sm text-muted-foreground mt-0.5">Tarefas realizadas vs atribuídas</p>
-            </div>
-            <a href="/team" className="text-sm text-primary hover:underline font-medium">Ver todos →</a>
-          </div>
-          
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {teamPerformance.slice(0, 4).map((member) => (
-              <div 
-                key={member.id} 
-                className="p-5 rounded-xl bg-secondary/30 border border-border/50 hover:bg-secondary/50 hover:border-primary/20 transition-all duration-200"
-              >
-                <div className="flex items-center gap-3 mb-5">
-                  <Avatar className="h-11 w-11 ring-2 ring-background">
-                    <AvatarFallback className="bg-primary/15 text-primary font-semibold text-sm">
-                      {member.avatar}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{member.name}</p>
-                    <p className="text-xs text-muted-foreground">{member.role}</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Realizadas</span>
-                    <span className="font-semibold text-success">{member.completedTasks}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Atribuídas</span>
-                    <span className="font-semibold text-foreground">{member.assignedTasks}</span>
-                  </div>
-                  <Progress value={member.completionRate} className="h-2" />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Taxa de conclusão</span>
-                    <span className="text-sm font-bold text-primary">{member.completionRate}%</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom Alerts Row */}
+        {/* Alerts Row - Overdue Tasks & Recent Intimations */}
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Overdue Tasks */}
           <div className={cn(
@@ -537,6 +489,54 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Team Performance */}
+        <div className="bg-card rounded-2xl border border-border p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">Desempenho da Equipe</h3>
+              <p className="text-sm text-muted-foreground mt-0.5">Tarefas realizadas vs atribuídas</p>
+            </div>
+            <a href="/team" className="text-sm text-primary hover:underline font-medium">Ver todos →</a>
+          </div>
+          
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {teamPerformance.slice(0, 4).map((member) => (
+              <div 
+                key={member.id} 
+                className="p-5 rounded-xl bg-secondary/30 border border-border/50 hover:bg-secondary/50 hover:border-primary/20 transition-all duration-200"
+              >
+                <div className="flex items-center gap-3 mb-5">
+                  <Avatar className="h-11 w-11 ring-2 ring-background">
+                    <AvatarFallback className="bg-primary/15 text-primary font-semibold text-sm">
+                      {member.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{member.name}</p>
+                    <p className="text-xs text-muted-foreground">{member.role}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Realizadas</span>
+                    <span className="font-semibold text-success">{member.completedTasks}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Atribuídas</span>
+                    <span className="font-semibold text-foreground">{member.assignedTasks}</span>
+                  </div>
+                  <Progress value={member.completionRate} className="h-2" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Taxa de conclusão</span>
+                    <span className="text-sm font-bold text-primary">{member.completionRate}%</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
