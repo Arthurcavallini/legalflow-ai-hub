@@ -62,7 +62,7 @@ const getExtendedMemberData = (member: TeamMember) => {
   // Personal info mock
   const personalInfo = {
     fullName: member.name,
-    email: `${member.name.toLowerCase().replace(' ', '.')}@lexflow.com`,
+    email: `${member.name.toLowerCase().replace(' ', '.')}@adv360.com`,
     phone: `(11) 9${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
     department: member.role.includes('Advogado') ? 'Jurídico' : member.role.includes('Paralegal') ? 'Apoio Jurídico' : 'Administrativo',
     location: 'São Paulo, SP',
