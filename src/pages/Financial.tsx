@@ -392,7 +392,7 @@ export default function Financial() {
               </div>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={cashFlowData} barGap={0} barCategoryGap="20%">
+                  <BarChart data={cashFlowData} barGap={-1} barCategoryGap="35%">
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                     <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} tickFormatter={(value) => `${value/1000}k`} />
