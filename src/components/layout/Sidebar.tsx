@@ -97,7 +97,10 @@ export function Sidebar({ isDark, onToggleTheme, collapsed, onToggleCollapsed }:
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 px-2 py-1 space-y-0.5 overflow-y-auto">
+        <nav className={cn(
+          "flex-1 overflow-y-auto",
+          collapsed ? "px-2 py-2 space-y-1" : "px-2 py-1 space-y-0.5"
+        )}>
           {mainNavItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -105,7 +108,10 @@ export function Sidebar({ isDark, onToggleTheme, collapsed, onToggleCollapsed }:
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  'flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-150 relative group',
+                  'flex items-center rounded-lg text-sm transition-all duration-150 relative',
+                  collapsed 
+                    ? 'justify-center w-10 h-10 mx-auto' 
+                    : 'gap-2.5 px-2.5 py-2',
                   isActive 
                     ? 'bg-primary text-primary-foreground font-medium' 
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary font-normal'
@@ -128,7 +134,7 @@ export function Sidebar({ isDark, onToggleTheme, collapsed, onToggleCollapsed }:
                   </>
                 )}
                 {collapsed && item.badge && (
-                  <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 text-[9px] font-bold rounded-full bg-primary text-primary-foreground">
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-[16px] px-0.5 text-[9px] font-bold rounded-full bg-destructive text-destructive-foreground border-2 border-card">
                     {item.badge}
                   </span>
                 )}
