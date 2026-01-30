@@ -18,12 +18,26 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { IntimacaoDetailSheet } from '@/components/intimacoes/IntimacaoDetailSheet';
 
 type NotificationStatus = 'pending' | 'acknowledged';
+
+interface CourtNotification {
+  id: string;
+  processNumber: string;
+  clientName: string;
+  type: string;
+  description: string;
+  receivedAt: Date;
+  deadline: Date;
+  status: 'pending' | 'acknowledged';
+  assignedTo: string;
+}
 
 export default function Intimacoes() {
   const [filter, setFilter] = useState<NotificationStatus | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedNotification, setSelectedNotification] = useState<CourtNotification | null>(null);
 
   const filteredNotifications = mockCourtNotifications.filter(n => {
     const matchesFilter = filter === 'all' || n.status === filter;
@@ -210,7 +224,14 @@ export default function Intimacoes() {
                       <Button size="sm" variant="outline" className="h-8">
                         <ExternalLink className="w-3.5 h-3.5" />
                       </Button>
-                      <Button size="sm" className="h-8 bg-primary hover:bg-primary/90">
+                      <Button 
+                        size="sm" 
+                        className="h-8 bg-primary hover:bg-primary/90"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedNotification(notification);
+                        }}
+                      >
                         Analisar
                       </Button>
                     </div>
@@ -235,6 +256,13 @@ export default function Intimacoes() {
           )}
         </div>
       </div>
+
+      {/* Intimação Detail Sheet */}
+      <IntimacaoDetailSheet
+        notification={selectedNotification}
+        open={!!selectedNotification}
+        onOpenChange={(open) => !open && setSelectedNotification(null)}
+      />
     </MainLayout>
   );
 }
