@@ -25,7 +25,6 @@ import {
   ArrowDownRight,
   Filter,
   Calendar,
-  FileText,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -53,6 +52,12 @@ const cashFlowData = [
   { month: 'Abr', entrada: 61000, saida: 35000 },
   { month: 'Mai', entrada: 55000, saida: 32000 },
   { month: 'Jun', entrada: 67000, saida: 38000 },
+  { month: 'Jul', entrada: 72000, saida: 41000 },
+  { month: 'Ago', entrada: 58000, saida: 34000 },
+  { month: 'Set', entrada: 63000, saida: 36000 },
+  { month: 'Out', entrada: 69000, saida: 39000 },
+  { month: 'Nov', entrada: 75000, saida: 42000 },
+  { month: 'Dez', entrada: 82000, saida: 45000 },
 ];
 
 const paymentMethodData = [
@@ -63,7 +68,7 @@ const paymentMethodData = [
 ];
 
 export default function Financial() {
-  const [activeTab, setActiveTab] = useState('transactions');
+  const [activeTab, setActiveTab] = useState('analytics');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPeriod, setFilterPeriod] = useState('all');
 
@@ -163,14 +168,11 @@ export default function Financial() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-secondary rounded-lg p-1">
-            <TabsTrigger value="transactions" className="rounded-md data-[state=active]:bg-card">
-              Transações
-            </TabsTrigger>
             <TabsTrigger value="analytics" className="rounded-md data-[state=active]:bg-card">
               Análises
             </TabsTrigger>
-            <TabsTrigger value="invoices" className="rounded-md data-[state=active]:bg-card">
-              Faturas
+            <TabsTrigger value="transactions" className="rounded-md data-[state=active]:bg-card">
+              Transações
             </TabsTrigger>
           </TabsList>
 
@@ -238,9 +240,9 @@ export default function Financial() {
                     const status = statusConfig[payment.status];
                     const StatusIcon = status.icon;
                     return (
-                      <TableRow key={payment.id} className="hover:bg-secondary/30">
-                        <TableCell className="font-medium">{getClientName(payment.clientId)}</TableCell>
-                        <TableCell className="font-semibold">{formatCurrency(payment.amount)}</TableCell>
+                    <TableRow key={payment.id} className="hover:bg-muted/30 border-border/50">
+                      <TableCell className="font-normal text-foreground/80">{getClientName(payment.clientId)}</TableCell>
+                        <TableCell className="font-medium text-foreground/90">{formatCurrency(payment.amount)}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className={cn("gap-1.5 text-xs border", status.color)}>
                             <StatusIcon className="w-3 h-3" />
@@ -293,13 +295,13 @@ export default function Financial() {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="mt-6 space-y-6">
             {/* Charts Row */}
-            <div className="grid gap-6 lg:grid-cols-3">
-              {/* Cash Flow Chart */}
-              <div className="lg:col-span-2 dashboard-card">
+            <div className="grid gap-6 lg:grid-cols-4">
+              {/* Cash Flow Area Chart */}
+              <div className="lg:col-span-3 dashboard-card">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h3 className="font-semibold">Fluxo de Caixa</h3>
-                    <p className="text-sm text-muted-foreground">Entradas vs Saídas - Últimos 6 meses</p>
+                    <p className="text-sm text-muted-foreground">Entradas vs Saídas - 12 meses</p>
                   </div>
                   <div className="flex items-center gap-4 text-xs">
                     <span className="flex items-center gap-2">
@@ -344,7 +346,7 @@ export default function Financial() {
                 </div>
               </div>
 
-              {/* Payment Methods Bar Chart */}
+              {/* Payment Methods */}
               <div className="dashboard-card">
                 <h3 className="font-semibold mb-1">Métodos de Pagamento</h3>
                 <p className="text-sm text-muted-foreground mb-6">Distribuição por método</p>
@@ -370,68 +372,47 @@ export default function Financial() {
               </div>
             </div>
 
-            {/* Monthly Comparison */}
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="dashboard-card">
-                <h3 className="font-semibold mb-4">Receitas por Mês</h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={cashFlowData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} tickFormatter={(value) => `${value/1000}k`} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          background: 'hsl(var(--popover))', 
-                          border: '1px solid hsl(var(--border))', 
-                          borderRadius: '8px'
-                        }}
-                        formatter={(value: number) => [formatCurrency(value), 'Receita']}
-                      />
-                      <Bar dataKey="entrada" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+            {/* Combined Bar Chart - Full Width */}
+            <div className="dashboard-card">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="font-semibold">Receitas vs Despesas</h3>
+                  <p className="text-sm text-muted-foreground">Comparativo mensal - 12 meses</p>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-primary" />
+                    <span className="text-muted-foreground">Receitas</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded bg-destructive" />
+                    <span className="text-muted-foreground">Despesas</span>
+                  </span>
                 </div>
               </div>
-
-              <div className="dashboard-card">
-                <h3 className="font-semibold mb-4">Despesas por Mês</h3>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={cashFlowData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} tickFormatter={(value) => `${value/1000}k`} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          background: 'hsl(var(--popover))', 
-                          border: '1px solid hsl(var(--border))', 
-                          borderRadius: '8px'
-                        }}
-                        formatter={(value: number) => [formatCurrency(value), 'Despesa']}
-                      />
-                      <Bar dataKey="saida" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={cashFlowData} barGap={2} barCategoryGap="15%">
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} tickFormatter={(value) => `${value/1000}k`} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        background: 'hsl(var(--popover))', 
+                        border: '1px solid hsl(var(--border))', 
+                        borderRadius: '8px',
+                        color: 'hsl(var(--popover-foreground))'
+                      }}
+                      formatter={(value: number, name: string) => [formatCurrency(value), name === 'entrada' ? 'Receita' : 'Despesa']}
+                    />
+                    <Bar dataKey="entrada" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} maxBarSize={24} />
+                    <Bar dataKey="saida" fill="hsl(var(--destructive))" radius={[3, 3, 0, 0]} maxBarSize={24} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </TabsContent>
 
-          {/* Invoices Tab */}
-          <TabsContent value="invoices" className="mt-6">
-            <div className="dashboard-card text-center py-16">
-              <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Faturas</h3>
-              <p className="text-muted-foreground text-sm mb-4">
-                Gerencie suas faturas e notas fiscais
-              </p>
-              <Button className="bg-primary hover:bg-primary/90">
-                <Plus className="w-4 h-4 mr-2" />
-                Criar Fatura
-              </Button>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
     </MainLayout>
