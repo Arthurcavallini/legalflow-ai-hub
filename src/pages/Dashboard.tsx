@@ -356,13 +356,13 @@ export default function Dashboard() {
               iconBg="bg-warning/10"
             />
             <StatCard
-              label="Clientes Ativos"
-              value={mockDashboardMetrics.activeClients}
-              icon={Users}
-              trend={{ value: 8, isPositive: true }}
-              trendLabel="este mês"
-              iconColor="text-success"
-              iconBg="bg-success/10"
+              label="Despesas do Mês"
+              value={formatCurrency(38000)}
+              icon={BarChart3}
+              trend={{ value: 5, isPositive: false }}
+              trendLabel="vs mês anterior"
+              iconColor="text-destructive"
+              iconBg="bg-destructive/10"
             />
           </div>
         </div>
