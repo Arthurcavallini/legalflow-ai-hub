@@ -528,13 +528,20 @@ export const mockContracts = [
   { id: '5', clientId: '5', serviceId: '6', status: 'draft' as const, value: 1500, createdAt: new Date('2024-01-14') },
 ];
 
-// Calendar events
+// Calendar events - using current dates (January 2026)
 export const mockCalendarEvents = [
-  { id: '1', title: 'Audiência - Fernanda Costa', type: 'hearing', date: new Date('2024-01-18T14:00:00'), clientId: '2', processId: '2' },
-  { id: '2', title: 'Prazo - Petição Roberto', type: 'deadline', date: new Date('2024-01-20T23:59:00'), clientId: '1', processId: '1' },
-  { id: '3', title: 'Reunião com cliente novo', type: 'meeting', date: new Date('2024-01-16T10:00:00') },
-  { id: '4', title: 'Prazo recursal - Pedro Lima', type: 'deadline', date: new Date('2024-01-29T23:59:00'), clientId: '3', processId: '3' },
-  { id: '5', title: 'Audiência inicial - Mariana', type: 'hearing', date: new Date('2024-01-25T09:00:00'), clientId: '4', processId: '4' },
+  { id: '1', title: 'Audiência - Fernanda Costa', type: 'hearing', date: new Date('2026-01-30T14:00:00'), clientId: '2', processId: '2' },
+  { id: '2', title: 'Prazo - Petição Roberto', type: 'deadline', date: new Date('2026-01-31T23:59:00'), clientId: '1', processId: '1' },
+  { id: '3', title: 'Reunião com cliente novo', type: 'meeting', date: new Date('2026-01-30T10:00:00') },
+  { id: '4', title: 'Prazo recursal - Pedro Lima', type: 'deadline', date: new Date('2026-02-05T23:59:00'), clientId: '3', processId: '3' },
+  { id: '5', title: 'Audiência inicial - Mariana', type: 'hearing', date: new Date('2026-02-03T09:00:00'), clientId: '4', processId: '4' },
+  { id: '6', title: 'Reunião equipe semanal', type: 'meeting', date: new Date('2026-02-02T09:00:00') },
+  { id: '7', title: 'Prazo - Contestação Souza', type: 'deadline', date: new Date('2026-02-07T23:59:00'), clientId: '4', processId: '4' },
+  { id: '8', title: 'Audiência - Roberto Almeida', type: 'hearing', date: new Date('2026-02-10T10:30:00'), clientId: '1', processId: '1' },
+  { id: '9', title: 'Reunião - Novo cliente', type: 'meeting', date: new Date('2026-02-04T15:00:00') },
+  { id: '10', title: 'Prazo - Recursos especiais', type: 'deadline', date: new Date('2026-02-12T23:59:00'), clientId: '2', processId: '2' },
+  { id: '11', title: 'Audiência conciliação', type: 'hearing', date: new Date('2026-01-31T11:00:00'), clientId: '3', processId: '3' },
+  { id: '12', title: 'Reunião financeira mensal', type: 'meeting', date: new Date('2026-02-01T14:00:00') },
 ];
 
 export const mockDashboardMetrics: DashboardMetrics = {
