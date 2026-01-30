@@ -149,14 +149,14 @@ export default function Production() {
         </div>
 
         {/* Kanban Board */}
-        <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2">
+        <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 h-[calc(100vh-220px)]">
           {productionColumns.map((column) => {
             const tasks = getTasksByStatus(column.id);
             const Icon = column.icon;
             return (
               <div
                 key={column.id}
-                className="flex-1 min-w-[280px] bg-secondary/30 rounded-xl p-4 border border-border"
+                className="flex-1 min-w-[280px] bg-secondary/30 rounded-xl p-4 border border-border flex flex-col overflow-hidden"
               >
                 <div className="flex items-center justify-between mb-4 px-1">
                   <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ export default function Production() {
                     {tasks.length}
                   </span>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-3 flex-1 overflow-y-auto">
                   {tasks.map((task) => (
                     <TaskCard key={task.id} task={task} onSelect={setSelectedTask} />
                   ))}
