@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
@@ -44,10 +43,11 @@ const mainNavItems: NavItem[] = [
 interface SidebarProps {
   isDark: boolean;
   onToggleTheme: () => void;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
 }
 
-export function Sidebar({ isDark, onToggleTheme }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+export function Sidebar({ isDark, onToggleTheme, collapsed, onToggleCollapsed }: SidebarProps) {
   const location = useLocation();
 
   return (
@@ -58,8 +58,8 @@ export function Sidebar({ isDark, onToggleTheme }: SidebarProps) {
       )}
     >
       <div className="flex flex-col h-full">
-        {/* Logo */}
-        <div className="flex items-center h-14 px-4 border-b border-border">
+        {/* Logo & Toggle */}
+        <div className="flex items-center justify-between h-14 px-3 border-b border-border">
           <div className="flex items-center gap-2.5">
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary">
               <Scale className="w-4 h-4 text-primary-foreground" />
@@ -70,6 +70,16 @@ export function Sidebar({ isDark, onToggleTheme }: SidebarProps) {
               </span>
             )}
           </div>
+          <button
+            onClick={onToggleCollapsed}
+            className="flex items-center justify-center w-7 h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-all duration-150"
+          >
+            {collapsed ? (
+              <ChevronRight className="w-4 h-4" />
+            ) : (
+              <ChevronLeft className="w-4 h-4" />
+            )}
+          </button>
         </div>
 
         {/* Search */}
@@ -156,20 +166,6 @@ export function Sidebar({ isDark, onToggleTheme }: SidebarProps) {
             <Settings className="w-[18px] h-[18px]" />
             {!collapsed && <span>Configurações</span>}
           </NavLink>
-
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm w-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-all duration-150"
-          >
-            {collapsed ? (
-              <ChevronRight className="w-[18px] h-[18px]" />
-            ) : (
-              <>
-                <ChevronLeft className="w-[18px] h-[18px]" />
-                <span>Recolher</span>
-              </>
-            )}
-          </button>
         </div>
       </div>
     </aside>
