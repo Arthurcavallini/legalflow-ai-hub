@@ -66,7 +66,7 @@ export function Sidebar({ isDark, onToggleTheme }: SidebarProps) {
             </div>
             {!collapsed && (
               <span className="text-base font-bold text-foreground">
-                LexFlow
+                ADV360
               </span>
             )}
           </div>
