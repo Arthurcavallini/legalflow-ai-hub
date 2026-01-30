@@ -47,9 +47,15 @@ const getExtendedMemberData = (member: TeamMember) => {
   const overdueTasks = baseTasks.filter(t => t.status === 'overdue');
   const pendingTasks = baseTasks.filter(t => t.status === 'pending');
   const inProgressTasks = baseTasks.filter(t => t.status === 'in_progress');
+  const completedTasks = baseTasks.filter(t => t.status === 'completed');
   
-  const tasksToday = Math.floor(Math.random() * 5) + 1;
-  const avgExecutionTime = Math.floor(Math.random() * 3) + 1; // days
+  // Tasks for today (simulated - would filter by dueDate in real app)
+  const tasksToday = Math.floor(Math.random() * 6) + 2;
+  const completedToday = Math.floor(Math.random() * (tasksToday - 1)) + 1;
+  const waitingToStart = Math.max(0, tasksToday - completedToday - inProgressTasks.length);
+  
+  // Additional stats for modal
+  const avgExecutionTime = Math.floor(Math.random() * 3) + 1;
   const activeProcesses = Math.floor(Math.random() * 8) + 2;
   const chatsAttended = Math.floor(Math.random() * 15) + 5;
   const documentsCreated = Math.floor(Math.random() * 10) + 2;
@@ -57,6 +63,7 @@ const getExtendedMemberData = (member: TeamMember) => {
   const monthlyTarget = 50;
   const targetProgress = Math.min(100, Math.round((member.tasksCompleted / monthlyTarget) * 100));
   const streak = Math.floor(Math.random() * 15) + 1;
+  
   const lastActivity = new Date(Date.now() - Math.random() * 3600000);
 
   // Personal info mock
@@ -76,7 +83,10 @@ const getExtendedMemberData = (member: TeamMember) => {
     overdueTasks: overdueTasks.length,
     pendingTasks: pendingTasks.length,
     inProgressTasks: inProgressTasks.length,
+    completedTasks: completedTasks.length,
     tasksToday,
+    completedToday,
+    waitingToStart,
     avgExecutionTime,
     activeProcesses,
     chatsAttended,
@@ -196,113 +206,116 @@ export default function Team() {
         </div>
 
         {/* Team Grid - Clean Cards */}
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredMembers.map((member) => {
             const status = statusConfig[member.status];
-            const totalTasks = member.tasksCompleted + member.pendingTasks + member.inProgressTasks;
-            const productivity = totalTasks > 0 ? Math.round((member.tasksCompleted / totalTasks) * 100) : 0;
+            const dailyProgress = member.tasksToday > 0 
+              ? Math.round((member.completedToday / member.tasksToday) * 100) 
+              : 0;
 
             return (
               <div 
                 key={member.id} 
-                className="bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                className="bg-card rounded-xl border border-border overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer"
                 onClick={() => setSelectedMember(member)}
               >
                 {/* Card Header */}
-                <div className="p-5 pb-4">
-                  <div className="flex items-center gap-4">
+                <div className="p-4 pb-3">
+                  <div className="flex items-center gap-3">
                     <div className="relative">
-                      <Avatar className="h-14 w-14">
-                        <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold">
+                      <Avatar className="h-11 w-11">
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
                           {member.avatar}
                         </AvatarFallback>
                       </Avatar>
                       <span className={cn(
-                        'absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-card',
+                        'absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-card',
                         member.status === 'active' ? 'bg-success' : member.status === 'vacation' ? 'bg-warning' : 'bg-muted-foreground'
                       )} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold text-foreground truncate">{member.name}</p>
-                        <Badge className={cn("text-[10px] font-medium", status.color)}>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-semibold text-sm text-foreground truncate">{member.name}</p>
+                        <Badge className={cn("text-[10px] font-medium shrink-0", status.color)}>
                           {status.label}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{member.role}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Último acesso: {formatTime(member.lastActivity)}
-                      </p>
+                      <p className="text-xs text-muted-foreground">{member.role}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Stats Grid */}
-                <div className="px-5 pb-4">
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-secondary/50 rounded-lg p-3 text-center">
-                      <p className="text-xl font-bold text-foreground">{member.tasksToday}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">Hoje</p>
+                {/* Task Stats - Clear Grid */}
+                <div className="px-4 pb-3">
+                  <div className="grid grid-cols-4 gap-2">
+                    {/* Tarefas de Hoje */}
+                    <div className="bg-primary/5 border border-primary/10 rounded-lg p-2.5 text-center">
+                      <p className="text-lg font-bold text-primary">{member.tasksToday}</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">Hoje</p>
                     </div>
-                    <div className="bg-secondary/50 rounded-lg p-3 text-center">
-                      <p className="text-xl font-bold text-primary">{member.activeProcesses}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">Processos</p>
-                    </div>
-                    <div className="bg-secondary/50 rounded-lg p-3 text-center">
-                      <p className="text-xl font-bold text-foreground">{member.avgExecutionTime}d</p>
-                      <p className="text-[10px] text-muted-foreground uppercase leading-tight">Tempo/Tarefa</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Task Summary */}
-                <div className="px-5 pb-4">
-                  <div className="flex items-center justify-between text-sm">
-                    {member.overdueTasks > 0 && (
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-destructive" />
-                        <span className="text-destructive font-medium">{member.overdueTasks} atraso</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-warning" />
-                      <span className="text-muted-foreground">{member.pendingTasks} pendentes</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-success" />
-                      <span className="text-muted-foreground">{member.tasksCompleted} feitas</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress */}
-                <div className="px-5 pb-4">
-                  <div className="flex items-center justify-between text-xs mb-2">
-                    <span className="text-muted-foreground">Meta mensal</span>
-                    <span className="font-semibold text-primary">{member.targetProgress}%</span>
-                  </div>
-                  <Progress value={member.targetProgress} className="h-1.5" />
-                </div>
-
-                {/* Footer */}
-                <div className="px-5 py-3 bg-secondary/30 border-t border-border/50 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    {member.weeklyGrowth >= 0 ? (
-                      <TrendingUp className="w-4 h-4 text-success" />
-                    ) : (
-                      <TrendingDown className="w-4 h-4 text-destructive" />
-                    )}
-                    <span className={cn(
-                      "text-sm font-medium",
-                      member.weeklyGrowth >= 0 ? "text-success" : "text-destructive"
+                    
+                    {/* Atrasadas */}
+                    <div className={cn(
+                      "rounded-lg p-2.5 text-center border",
+                      member.overdueTasks > 0 
+                        ? "bg-destructive/5 border-destructive/20" 
+                        : "bg-secondary/50 border-transparent"
                     )}>
-                      {member.weeklyGrowth >= 0 ? '+' : ''}{member.weeklyGrowth}%
-                    </span>
-                    <span className="text-xs text-muted-foreground">vs semana</span>
+                      <p className={cn(
+                        "text-lg font-bold",
+                        member.overdueTasks > 0 ? "text-destructive" : "text-muted-foreground"
+                      )}>
+                        {member.overdueTasks}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">Atrasadas</p>
+                    </div>
+                    
+                    {/* Pendentes */}
+                    <div className={cn(
+                      "rounded-lg p-2.5 text-center border",
+                      member.pendingTasks > 0 
+                        ? "bg-warning/5 border-warning/20" 
+                        : "bg-secondary/50 border-transparent"
+                    )}>
+                      <p className={cn(
+                        "text-lg font-bold",
+                        member.pendingTasks > 0 ? "text-warning" : "text-muted-foreground"
+                      )}>
+                        {member.pendingTasks}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">Pendentes</p>
+                    </div>
+                    
+                    {/* Aguardando */}
+                    <div className="bg-secondary/50 rounded-lg p-2.5 text-center">
+                      <p className="text-lg font-bold text-muted-foreground">{member.waitingToStart}</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">Aguardando</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Award className="w-4 h-4 text-warning" />
-                    <span className="text-sm font-medium">{member.streak}d</span>
+                </div>
+
+                {/* Daily Progress */}
+                <div className="px-4 pb-4">
+                  <div className="flex items-center justify-between text-xs mb-2">
+                    <span className="text-muted-foreground">Progresso do dia</span>
+                    <span className="font-semibold">
+                      <span className="text-success">{member.completedToday}</span>
+                      <span className="text-muted-foreground">/{member.tasksToday} tarefas</span>
+                    </span>
+                  </div>
+                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-success to-success/80 rounded-full transition-all duration-500"
+                      style={{ width: `${dailyProgress}%` }}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between mt-1.5">
+                    <span className="text-[10px] text-muted-foreground">
+                      {dailyProgress === 100 ? '✓ Meta atingida' : `${dailyProgress}% concluído`}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {member.tasksToday - member.completedToday} restantes
+                    </span>
                   </div>
                 </div>
               </div>
