@@ -153,11 +153,11 @@ export function KanbanBoard() {
 
   return (
     <>
-      <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2">
+      <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 h-[calc(100vh-220px)]">
         {columns.map((column) => {
           const leads = getLeadsByStatus(column.id);
           return (
-            <div key={column.id} className="flex-1 min-w-[280px] bg-secondary/30 rounded-xl p-4 border border-border">
+            <div key={column.id} className="flex-1 min-w-[280px] bg-secondary/30 rounded-xl p-4 border border-border flex flex-col overflow-hidden">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <span className={cn('w-2.5 h-2.5 rounded-full', column.color)} />
@@ -167,7 +167,7 @@ export function KanbanBoard() {
                   {leads.length}
                 </Badge>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-3 flex-1 overflow-y-auto">
                 {leads.map((lead) => (
                   <LeadCard key={lead.id} lead={lead} onSelect={setSelectedLead} />
                 ))}
