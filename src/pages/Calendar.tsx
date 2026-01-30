@@ -133,7 +133,100 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        {/* Calendar - Full Width */}
+        {/* Top Section: Upcoming Events + Selected Date */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Upcoming Events */}
+          <div className={cn("dashboard-card", !selectedDate && "lg:col-span-2")}>
+            <h3 className="font-semibold text-sm text-foreground mb-4">Próximos Eventos</h3>
+            <div className={cn("grid gap-3", !selectedDate ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2")}>
+              {upcomingEvents.map(event => {
+                const config = eventTypeConfig[event.type as keyof typeof eventTypeConfig];
+                const EventIcon = config.icon;
+                const eventDate = new Date(event.date);
+
+                return (
+                  <div
+                    key={event.id}
+                    className="p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={cn('p-2 rounded-lg', config.bgLight)}>
+                        <EventIcon className={cn('w-4 h-4', config.textColor)} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{event.title}</p>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <CalendarIcon className="w-3 h-3" />
+                            {eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Selected Date Events */}
+          {selectedDate && (
+            <div className="dashboard-card">
+              <h3 className="font-semibold text-sm text-foreground mb-4">
+                {selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+              </h3>
+              {selectedDateEvents.length > 0 ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {selectedDateEvents.map(event => {
+                    const config = eventTypeConfig[event.type as keyof typeof eventTypeConfig];
+                    const EventIcon = config.icon;
+                    const eventDate = new Date(event.date);
+                    const clientName = event.clientId
+                      ? mockClients.find(c => c.id === event.clientId)?.name
+                      : null;
+
+                    return (
+                      <div
+                        key={event.id}
+                        className={cn("p-3 rounded-lg border-l-4", config.bgLight)}
+                        style={{ borderLeftColor: `hsl(var(--${config.color.replace('bg-', '')}))` }}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <EventIcon className={cn("w-4 h-4", config.textColor)} />
+                          <Badge variant="outline" className={cn('text-xs border', config.bgLight, config.textColor)}>
+                            {config.label}
+                          </Badge>
+                        </div>
+                        <p className="font-medium text-sm">{event.title}</p>
+                        {clientName && (
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                            <User className="w-3 h-3" />
+                            {clientName}
+                          </p>
+                        )}
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                          <Clock className="w-3 h-3" />
+                          {eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <CalendarIcon className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Nenhum evento neste dia</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Calendar - Full Width at Bottom */}
         <div className="dashboard-card">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
@@ -300,99 +393,6 @@ export default function CalendarPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* Bottom Section: Selected Date + Upcoming Events */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Selected Date Events */}
-          {selectedDate && (
-            <div className="dashboard-card">
-              <h3 className="font-semibold text-sm text-foreground mb-4">
-                {selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
-              </h3>
-              {selectedDateEvents.length > 0 ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {selectedDateEvents.map(event => {
-                    const config = eventTypeConfig[event.type as keyof typeof eventTypeConfig];
-                    const EventIcon = config.icon;
-                    const eventDate = new Date(event.date);
-                    const clientName = event.clientId
-                      ? mockClients.find(c => c.id === event.clientId)?.name
-                      : null;
-
-                    return (
-                      <div
-                        key={event.id}
-                        className={cn("p-3 rounded-lg border-l-4", config.bgLight)}
-                        style={{ borderLeftColor: `hsl(var(--${config.color.replace('bg-', '')}))` }}
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <EventIcon className={cn("w-4 h-4", config.textColor)} />
-                          <Badge variant="outline" className={cn('text-xs border', config.bgLight, config.textColor)}>
-                            {config.label}
-                          </Badge>
-                        </div>
-                        <p className="font-medium text-sm">{event.title}</p>
-                        {clientName && (
-                          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                            <User className="w-3 h-3" />
-                            {clientName}
-                          </p>
-                        )}
-                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                          <Clock className="w-3 h-3" />
-                          {eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <CalendarIcon className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Nenhum evento neste dia</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Upcoming Events */}
-          <div className={cn("dashboard-card", !selectedDate && "lg:col-span-2")}>
-            <h3 className="font-semibold text-sm text-foreground mb-4">Próximos Eventos</h3>
-            <div className={cn("grid gap-3", !selectedDate ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2")}>
-              {upcomingEvents.map(event => {
-                const config = eventTypeConfig[event.type as keyof typeof eventTypeConfig];
-                const EventIcon = config.icon;
-                const eventDate = new Date(event.date);
-
-                return (
-                  <div
-                    key={event.id}
-                    className="p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={cn('p-2 rounded-lg', config.bgLight)}>
-                        <EventIcon className={cn('w-4 h-4', config.textColor)} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{event.title}</p>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <CalendarIcon className="w-3 h-3" />
-                            {eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {eventDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </div>
       </div>
