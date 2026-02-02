@@ -19,6 +19,12 @@ import {
   XCircle,
   Bot,
   Plus,
+  Paperclip,
+  Upload,
+  Download,
+  Trash2,
+  File,
+  Image,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +51,11 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
   const [newContractOpen, setNewContractOpen] = useState(false);
   const [newTaskOpen, setNewTaskOpen] = useState(false);
   const [newPaymentOpen, setNewPaymentOpen] = useState(false);
+  const [attachments, setAttachments] = useState<{id: string; name: string; size: number; type: string; uploadedAt: Date}[]>([
+    { id: '1', name: 'RG_Roberto.pdf', size: 524288, type: 'pdf', uploadedAt: new Date('2024-01-15') },
+    { id: '2', name: 'Comprovante_Residencia.pdf', size: 312456, type: 'pdf', uploadedAt: new Date('2024-01-14') },
+    { id: '3', name: 'Foto_Documento.jpg', size: 1048576, type: 'image', uploadedAt: new Date('2024-01-12') },
+  ]);
 
   if (!client) return null;
 
@@ -245,7 +256,7 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
 
           {/* Tabs */}
           <Tabs defaultValue="processes" className="space-y-4">
-            <TabsList className="w-full bg-secondary/50 rounded-xl p-1 h-auto grid grid-cols-4">
+            <TabsList className="w-full bg-secondary/50 rounded-xl p-1 h-auto grid grid-cols-5">
               <TabsTrigger value="processes" className="rounded-lg py-2 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
                 <FileText className="w-3.5 h-3.5 mr-1.5" />
                 Processos
@@ -261,6 +272,10 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
               <TabsTrigger value="payments" className="rounded-lg py-2 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
                 <DollarSign className="w-3.5 h-3.5 mr-1.5" />
                 Financeiro
+              </TabsTrigger>
+              <TabsTrigger value="attachments" className="rounded-lg py-2 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+                <Paperclip className="w-3.5 h-3.5 mr-1.5" />
+                Anexos
               </TabsTrigger>
             </TabsList>
 
@@ -517,6 +532,87 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                   <FileSignature className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm font-medium">Nenhum contrato</p>
                   <p className="text-xs text-muted-foreground">Este cliente não possui contratos cadastrados</p>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Attachments Tab */}
+            <TabsContent value="attachments" className="space-y-3 mt-4">
+              <label htmlFor="file-upload-client">
+                <div className="border-2 border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors">
+                  <Upload className="w-6 h-6 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm font-medium text-foreground">Clique para anexar arquivo</p>
+                  <p className="text-xs text-muted-foreground mt-1">PDF, DOC, JPG, PNG até 10MB</p>
+                </div>
+                <input 
+                  type="file" 
+                  id="file-upload-client" 
+                  className="hidden" 
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setAttachments(prev => [...prev, {
+                        id: Date.now().toString(),
+                        name: file.name,
+                        size: file.size,
+                        type: file.type.includes('image') ? 'image' : 'pdf',
+                        uploadedAt: new Date()
+                      }]);
+                    }
+                  }}
+                />
+              </label>
+
+              {attachments.length > 0 ? (
+                <div className="space-y-2">
+                  {attachments.map((attachment) => {
+                    const formatFileSize = (bytes: number) => {
+                      if (bytes < 1024) return bytes + ' B';
+                      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                    };
+
+                    return (
+                      <div key={attachment.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border hover:border-primary/20 transition-colors">
+                        <div className={cn(
+                          "p-2 rounded-lg",
+                          attachment.type === 'image' ? "bg-purple-500/10" : "bg-primary/10"
+                        )}>
+                          {attachment.type === 'image' ? (
+                            <Image className="w-4 h-4 text-purple-500" />
+                          ) : (
+                            <File className="w-4 h-4 text-primary" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{attachment.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatFileSize(attachment.size)} • {formatDate(attachment.uploadedAt)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                            <Download className="w-4 h-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={() => setAttachments(prev => prev.filter(a => a.id !== attachment.id))}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Paperclip className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-sm font-medium">Nenhum anexo</p>
+                  <p className="text-xs text-muted-foreground">Este cliente não possui arquivos anexados</p>
                 </div>
               )}
             </TabsContent>

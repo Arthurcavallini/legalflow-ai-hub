@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -17,8 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FileSignature, Package, DollarSign } from 'lucide-react';
+import { Package, DollarSign, Upload, FileText, X } from 'lucide-react';
 import { mockServices } from '@/data/mockData';
+import { cn } from '@/lib/utils';
 
 interface NewContractDialogProps {
   open: boolean;
@@ -29,6 +30,8 @@ interface NewContractDialogProps {
 export function NewContractDialog({ open, onOpenChange, clientName }: NewContractDialogProps) {
   const [selectedService, setSelectedService] = useState('');
   const [value, setValue] = useState('');
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleServiceChange = (serviceId: string) => {
     setSelectedService(serviceId);
@@ -36,6 +39,26 @@ export function NewContractDialog({ open, onOpenChange, clientName }: NewContrac
     if (service) {
       setValue(service.basePrice.toString());
     }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAttachedFile(file);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setAttachedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
   return (
@@ -88,22 +111,50 @@ export function NewContractDialog({ open, onOpenChange, clientName }: NewContrac
             />
           </div>
 
+          {/* File Attachment */}
           <div className="grid gap-2">
-            <Label htmlFor="template" className="flex items-center gap-2">
-              <FileSignature className="w-3.5 h-3.5 text-muted-foreground" />
-              Modelo de Contrato
+            <Label className="flex items-center gap-2">
+              <Upload className="w-3.5 h-3.5 text-muted-foreground" />
+              Anexar Contrato (PDF)
             </Label>
-            <Select>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Selecione o modelo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="padrao">Contrato Padrão</SelectItem>
-                <SelectItem value="trabalhista">Contrato Trabalhista</SelectItem>
-                <SelectItem value="familia">Contrato Família</SelectItem>
-                <SelectItem value="consumidor">Contrato Consumidor</SelectItem>
-              </SelectContent>
-            </Select>
+            
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx"
+              onChange={handleFileChange}
+              className="hidden"
+              id="contract-file"
+            />
+
+            {!attachedFile ? (
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors"
+              >
+                <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm font-medium text-foreground">Clique para anexar</p>
+                <p className="text-xs text-muted-foreground mt-1">PDF, DOC ou DOCX até 10MB</p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{attachedFile.name}</p>
+                  <p className="text-xs text-muted-foreground">{formatFileSize(attachedFile.size)}</p>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={handleRemoveFile}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
