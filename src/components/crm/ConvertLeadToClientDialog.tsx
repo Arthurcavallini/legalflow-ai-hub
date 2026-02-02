@@ -10,7 +10,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import {
   Select,
@@ -19,30 +18,67 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Bot, User, Phone, Mail, MapPin, CreditCard, Hash, Package } from 'lucide-react';
+import { Bot, User, Phone, Mail, MapPin, CreditCard, Hash, Package, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { mockServices } from '@/data/mockData';
+import { Lead } from '@/types';
+import { Badge } from '@/components/ui/badge';
 
-interface NewClientDialogProps {
+interface ConvertLeadToClientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  lead: Lead | null;
 }
 
-export function NewClientDialog({ open, onOpenChange }: NewClientDialogProps) {
+export function ConvertLeadToClientDialog({ open, onOpenChange, lead }: ConvertLeadToClientDialogProps) {
   const [aiEnabled, setAiEnabled] = useState(true);
   const [selectedService, setSelectedService] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+
+  // Pre-fill with lead data when dialog opens
+  useState(() => {
+    if (lead) {
+      setName(lead.name);
+      setPhone(lead.phone);
+      setEmail(lead.email || '');
+      setAiEnabled(lead.aiEnabled !== false);
+    }
+  });
+
+  if (!lead) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] p-0 gap-0 overflow-hidden">
         <DialogHeader className="px-6 py-5 border-b border-border">
-          <DialogTitle className="text-lg font-semibold">Novo Cliente</DialogTitle>
+          <div className="flex items-center gap-2 mb-1">
+            <Badge variant="outline" className="bg-success/10 text-success border-success/30 text-xs">
+              Lead → Cliente
+            </Badge>
+          </div>
+          <DialogTitle className="text-lg font-semibold">Converter em Cliente</DialogTitle>
           <DialogDescription>
-            Cadastre um novo cliente no sistema.
+            Convertendo {lead.name} de lead para cliente.
           </DialogDescription>
         </DialogHeader>
 
         <div className="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
+          {/* Lead Info Preview */}
+          <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <ArrowRight className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Dados do Lead</p>
+                <p className="text-xs text-muted-foreground">
+                  Origem: {lead.source === 'whatsapp' ? 'WhatsApp' : lead.source === 'website' ? 'Website' : lead.source === 'referral' ? 'Indicação' : 'Outro'} • {lead.caseType}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* AI Toggle */}
           <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/50">
@@ -76,7 +112,13 @@ export function NewClientDialog({ open, onOpenChange }: NewClientDialogProps) {
                 <User className="w-3.5 h-3.5 text-muted-foreground" />
                 Nome Completo
               </Label>
-              <Input id="name" placeholder="Ex: Roberto Almeida" className="h-10" />
+              <Input 
+                id="name" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ex: Roberto Almeida" 
+                className="h-10" 
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -85,14 +127,27 @@ export function NewClientDialog({ open, onOpenChange }: NewClientDialogProps) {
                   <Phone className="w-3.5 h-3.5 text-muted-foreground" />
                   Telefone
                 </Label>
-                <Input id="phone" placeholder="(11) 99999-9999" className="h-10" />
+                <Input 
+                  id="phone" 
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="(11) 99999-9999" 
+                  className="h-10" 
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email" className="flex items-center gap-2">
                   <Mail className="w-3.5 h-3.5 text-muted-foreground" />
                   Email
                 </Label>
-                <Input id="email" type="email" placeholder="email@exemplo.com" className="h-10" />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="email@exemplo.com" 
+                  className="h-10" 
+                />
               </div>
             </div>
 
@@ -153,24 +208,15 @@ export function NewClientDialog({ open, onOpenChange }: NewClientDialogProps) {
               </Select>
             </div>
           </div>
-
-          {/* Notes */}
-          <div className="grid gap-2">
-            <Label htmlFor="notes">Observações</Label>
-            <Textarea 
-              id="notes" 
-              placeholder="Informações adicionais sobre o cliente..." 
-              className="min-h-[80px] resize-none"
-            />
-          </div>
         </div>
 
         <DialogFooter className="px-6 py-4 border-t border-border bg-secondary/20">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button className="bg-primary hover:bg-primary/90">
-            Cadastrar Cliente
+          <Button className="bg-success hover:bg-success/90 gap-2">
+            <User className="w-4 h-4" />
+            Converter em Cliente
           </Button>
         </DialogFooter>
       </DialogContent>

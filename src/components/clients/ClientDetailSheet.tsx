@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Client } from '@/types';
 import { mockProcesses, mockPayments, mockTasks, mockTeamMembers, mockContracts, mockServices } from '@/data/mockData';
 import { 
@@ -17,6 +18,7 @@ import {
   FileSignature,
   XCircle,
   Bot,
+  Plus,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +29,10 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { NewProcessDialog } from './NewProcessDialog';
+import { NewContractDialog } from './NewContractDialog';
+import { NewTaskDialog } from './NewTaskDialog';
+import { NewPaymentDialog } from './NewPaymentDialog';
 
 interface ClientDetailSheetProps {
   client: Client | null;
@@ -35,6 +41,11 @@ interface ClientDetailSheetProps {
 }
 
 export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSheetProps) {
+  const [newProcessOpen, setNewProcessOpen] = useState(false);
+  const [newContractOpen, setNewContractOpen] = useState(false);
+  const [newTaskOpen, setNewTaskOpen] = useState(false);
+  const [newPaymentOpen, setNewPaymentOpen] = useState(false);
+
   if (!client) return null;
 
   const clientProcesses = mockProcesses.filter(p => p.clientId === client.id);
@@ -255,6 +266,15 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
 
             {/* Processes Tab */}
             <TabsContent value="processes" className="space-y-3 mt-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full gap-2 border-dashed"
+                onClick={() => setNewProcessOpen(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Adicionar Processo
+              </Button>
               {clientProcesses.length > 0 ? (
                 clientProcesses.map((process) => {
                   const config = statusConfig[process.status as keyof typeof statusConfig] || statusConfig.intake;
@@ -286,8 +306,8 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                   );
                 })
               ) : (
-                <div className="text-center py-12">
-                  <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <div className="text-center py-8">
+                  <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm font-medium">Nenhum processo</p>
                   <p className="text-xs text-muted-foreground">Este cliente não possui processos cadastrados</p>
                 </div>
@@ -296,6 +316,15 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
 
             {/* Tasks Tab */}
             <TabsContent value="tasks" className="space-y-3 mt-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full gap-2 border-dashed"
+                onClick={() => setNewTaskOpen(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Adicionar Tarefa
+              </Button>
               {clientTasks.length > 0 ? (
                 clientTasks.map((task) => {
                   const isOverdue = task.status === 'overdue';
@@ -347,8 +376,8 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                   );
                 })
               ) : (
-                <div className="text-center py-12">
-                  <ListTodo className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <div className="text-center py-8">
+                  <ListTodo className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm font-medium">Nenhuma tarefa</p>
                   <p className="text-xs text-muted-foreground">Este cliente não possui tarefas cadastradas</p>
                 </div>
@@ -357,6 +386,15 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
 
             {/* Payments Tab */}
             <TabsContent value="payments" className="space-y-3 mt-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full gap-2 border-dashed"
+                onClick={() => setNewPaymentOpen(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Adicionar Lançamento
+              </Button>
               {clientPayments.length > 0 ? (
                 <>
                   {/* Summary */}
@@ -425,8 +463,8 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                   })}
                 </>
               ) : (
-                <div className="text-center py-12">
-                  <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <div className="text-center py-8">
+                  <DollarSign className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm font-medium">Nenhum pagamento</p>
                   <p className="text-xs text-muted-foreground">Este cliente não possui pagamentos cadastrados</p>
                 </div>
@@ -435,6 +473,15 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
 
             {/* Contracts Tab */}
             <TabsContent value="contracts" className="space-y-3 mt-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full gap-2 border-dashed"
+                onClick={() => setNewContractOpen(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Adicionar Contrato
+              </Button>
               {clientContracts.length > 0 ? (
                 clientContracts.map((contract) => {
                   const config = contractStatusConfig[contract.status as keyof typeof contractStatusConfig] || contractStatusConfig.draft;
@@ -466,8 +513,8 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                   );
                 })
               ) : (
-                <div className="text-center py-12">
-                  <FileSignature className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <div className="text-center py-8">
+                  <FileSignature className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm font-medium">Nenhum contrato</p>
                   <p className="text-xs text-muted-foreground">Este cliente não possui contratos cadastrados</p>
                 </div>
@@ -476,6 +523,31 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
           </Tabs>
         </div>
       </SheetContent>
+
+      {/* Dialogs */}
+      <NewProcessDialog 
+        open={newProcessOpen} 
+        onOpenChange={setNewProcessOpen}
+        clientName={client.name}
+      />
+      <NewContractDialog 
+        open={newContractOpen} 
+        onOpenChange={setNewContractOpen}
+        clientName={client.name}
+      />
+      <NewTaskDialog 
+        open={newTaskOpen} 
+        onOpenChange={setNewTaskOpen}
+        clientName={client.name}
+        clientId={client.id}
+        clientProcesses={clientProcesses}
+      />
+      <NewPaymentDialog 
+        open={newPaymentOpen} 
+        onOpenChange={setNewPaymentOpen}
+        clientName={client.name}
+        clientId={client.id}
+      />
     </Sheet>
   );
 }
