@@ -24,11 +24,13 @@ import { LeadDetailSheet } from './LeadDetailSheet';
 import { ConvertLeadToClientDialog } from './ConvertLeadToClientDialog';
 
 const columns = [
-  { id: 'new', label: 'Novos', color: 'bg-primary' },
-  { id: 'qualified', label: 'Qualificados', color: 'bg-cyan-500' },
-  { id: 'proposal', label: 'Proposta', color: 'bg-warning' },
-  { id: 'negotiation', label: 'Negociação', color: 'bg-purple-500' },
-  { id: 'closed', label: 'Fechados', color: 'bg-success' },
+  { id: 'in_conversation', label: 'Em Conversa', color: 'bg-primary' },
+  { id: 'requested_quote', label: 'Pediu Orçamento', color: 'bg-cyan-500' },
+  { id: 'closing_quote', label: 'Fechar Orçamento', color: 'bg-warning' },
+  { id: 'waiting_service', label: 'Aguardando Atendimento', color: 'bg-purple-500' },
+  { id: 'client_questions', label: 'Clientes Dúvidas', color: 'bg-orange-500' },
+  { id: 'stopped_responding', label: 'Parou de responder', color: 'bg-destructive' },
+  { id: 'finished', label: 'Finalizado', color: 'bg-success' },
 ];
 
 // Extended lead data with more info

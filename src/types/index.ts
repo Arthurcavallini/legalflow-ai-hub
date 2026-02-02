@@ -22,7 +22,7 @@ export interface Lead {
   phone: string;
   email?: string;
   source: 'whatsapp' | 'website' | 'referral' | 'other';
-  status: 'new' | 'qualified' | 'proposal' | 'negotiation' | 'closed' | 'lost';
+  status: 'in_conversation' | 'requested_quote' | 'closing_quote' | 'waiting_service' | 'client_questions' | 'stopped_responding' | 'finished';
   caseType?: string;
   urgency: 'low' | 'medium' | 'high';
   probability: number;
