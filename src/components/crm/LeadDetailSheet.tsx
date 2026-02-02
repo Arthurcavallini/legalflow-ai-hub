@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Lead } from '@/types';
-import { Phone, MessageSquare, Clock, Sparkles, Edit, Send, Eye, PhoneCall, FileText, UserCheck, Bot } from 'lucide-react';
+import { Phone, MessageSquare, Clock, Sparkles, Edit, Send, Eye, PhoneCall, FileText, UserCheck, Bot, UserPlus } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { ConvertLeadToClientDialog } from './ConvertLeadToClientDialog';
+
 interface ExtendedLead extends Lead {
   email: string;
   phone: string;
@@ -86,6 +89,8 @@ export function LeadDetailSheet({
   open,
   onOpenChange
 }: LeadDetailSheetProps) {
+  const [convertDialogOpen, setConvertDialogOpen] = useState(false);
+
   if (!lead) return null;
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -166,7 +171,8 @@ export function LeadDetailSheet({
         return 'bg-muted text-muted-foreground border-border';
     }
   };
-  return <Sheet open={open} onOpenChange={onOpenChange}>
+  return <>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl bg-card border-border overflow-y-auto p-0">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-card border-b border-border px-6 py-5">
@@ -192,6 +198,15 @@ export function LeadDetailSheet({
               </Button>
             </div>
           </SheetHeader>
+
+          {/* Convert to Client Button */}
+          <Button 
+            onClick={() => setConvertDialogOpen(true)}
+            className="w-full mt-4 gap-2 bg-success hover:bg-success/90"
+          >
+            <UserPlus className="w-4 h-4" />
+            Converter em Cliente
+          </Button>
         </div>
 
         <div className="p-6 space-y-5">
@@ -314,5 +329,13 @@ export function LeadDetailSheet({
           </Tabs>
         </div>
       </SheetContent>
-    </Sheet>;
+    </Sheet>
+
+    {/* Convert to Client Dialog */}
+    <ConvertLeadToClientDialog 
+      open={convertDialogOpen}
+      onOpenChange={setConvertDialogOpen}
+      lead={lead}
+    />
+  </>;
 }
