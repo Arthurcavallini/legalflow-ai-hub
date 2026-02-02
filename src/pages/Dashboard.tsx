@@ -380,7 +380,7 @@ export default function Dashboard() {
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Overdue Tasks */}
           <div className={cn(
-            'bg-card rounded-2xl border p-6',
+            'bg-card rounded-2xl border p-6 flex flex-col',
             overdueTasks.length > 0 ? 'border-destructive/30' : 'border-border'
           )}>
             <div className="flex items-center gap-4 mb-5">
@@ -399,7 +399,7 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-3 flex-1">
               {overdueTasks.length > 0 ? (
                 overdueTasks.slice(0, 4).map((task) => {
                   const assignee = mockTeamMembers.find(m => m.id === task.assignedTo);
@@ -434,7 +434,7 @@ export default function Dashboard() {
 
           {/* Recent Intimations */}
           <div className={cn(
-            'bg-card rounded-2xl border p-6',
+            'bg-card rounded-2xl border p-6 flex flex-col',
             pendingNotifications.length > 0 ? 'border-warning/30' : 'border-border'
           )}>
             <div className="flex items-center gap-4 mb-5">
@@ -453,7 +453,7 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-3 flex-1">
               {pendingNotifications.length > 0 ? (
                 pendingNotifications.slice(0, 4).map((notification) => {
                   const daysUntil = Math.ceil((notification.deadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
