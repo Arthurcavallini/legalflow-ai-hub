@@ -32,6 +32,7 @@ export interface Lead {
   updatedAt: Date;
   lastContactAt?: Date;
   notes?: string;
+  aiEnabled?: boolean;
   aiClassification?: {
     intent: string;
     sentiment: string;
@@ -51,6 +52,7 @@ export interface Client {
   createdAt: Date;
   updatedAt: Date;
   leadId?: string;
+  aiEnabled?: boolean;
 }
 
 export interface Process {

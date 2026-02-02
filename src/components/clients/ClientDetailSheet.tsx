@@ -16,12 +16,14 @@ import {
   MessageSquare,
   FileSignature,
   XCircle,
+  Bot,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -143,6 +145,30 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
         </div>
 
         <div className="p-6 space-y-6">
+          {/* AI Toggle */}
+          <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/50">
+            <div className="flex items-center gap-3">
+              <div className={cn(
+                'p-2.5 rounded-xl',
+                client.aiEnabled !== false ? 'bg-primary/10' : 'bg-muted'
+              )}>
+                <Bot className={cn(
+                  'w-5 h-5',
+                  client.aiEnabled !== false ? 'text-primary' : 'text-muted-foreground'
+                )} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Atendimento IA</p>
+                <p className="text-xs text-muted-foreground">
+                  {client.aiEnabled !== false ? 'Bot ativo para este cliente' : 'Atendimento manual'}
+                </p>
+              </div>
+            </div>
+            <Switch 
+              checked={client.aiEnabled !== false} 
+              onCheckedChange={() => {}}
+            />
+          </div>
           {/* Quick Stats */}
           <div className="grid grid-cols-4 gap-3">
             <div className="text-center p-4 rounded-xl bg-secondary/50">

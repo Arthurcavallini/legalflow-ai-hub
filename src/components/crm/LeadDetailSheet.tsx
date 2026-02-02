@@ -1,10 +1,11 @@
 import { Lead } from '@/types';
-import { Phone, MessageSquare, Clock, Sparkles, Edit, Send, Eye, PhoneCall, FileText, UserCheck } from 'lucide-react';
+import { Phone, MessageSquare, Clock, Sparkles, Edit, Send, Eye, PhoneCall, FileText, UserCheck, Bot } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 interface ExtendedLead extends Lead {
   email: string;
@@ -16,6 +17,7 @@ interface ExtendedLead extends Lead {
   responseTime: number;
   interests: string[];
   aiSummary: string;
+  aiEnabled?: boolean;
   conversationHistory: {
     type: string;
     message: string;
@@ -193,6 +195,30 @@ export function LeadDetailSheet({
         </div>
 
         <div className="p-6 space-y-5">
+          {/* AI Toggle */}
+          <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/50">
+            <div className="flex items-center gap-3">
+              <div className={cn(
+                'p-2 rounded-lg',
+                lead.aiEnabled !== false ? 'bg-primary/10' : 'bg-muted'
+              )}>
+                <Bot className={cn(
+                  'w-4 h-4',
+                  lead.aiEnabled !== false ? 'text-primary' : 'text-muted-foreground'
+                )} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Atendimento IA</p>
+                <p className="text-xs text-muted-foreground">
+                  {lead.aiEnabled !== false ? 'Bot ativo para este lead' : 'Atendimento manual'}
+                </p>
+              </div>
+            </div>
+            <Switch 
+              checked={lead.aiEnabled !== false} 
+              onCheckedChange={() => {}}
+            />
+          </div>
           {/* AI Summary Card */}
           <div className="p-4 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-purple-500/5 border border-purple-500/10 rounded-2xl">
             <div className="flex items-center gap-2.5 mb-2.5">
