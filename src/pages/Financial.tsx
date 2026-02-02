@@ -287,7 +287,7 @@ export default function Financial() {
                   onClick={() => setNewChargeOpen(true)}
                 >
                   <Plus className="w-4 h-4" />
-                  Nova Cobrança
+                  Nova Movimentação
                 </Button>
               </div>
             </div>
