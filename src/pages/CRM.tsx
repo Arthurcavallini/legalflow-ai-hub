@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { KanbanBoard } from '@/components/crm/KanbanBoard';
+import { NewLeadDialog } from '@/components/crm/NewLeadDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Filter, Download } from 'lucide-react';
 
 export default function CRM() {
+  const [newLeadOpen, setNewLeadOpen] = useState(false);
+
   return (
     <MainLayout title="CRM" subtitle="Captação de leads">
       <div className="space-y-6">
@@ -28,7 +32,11 @@ export default function CRM() {
               <Download className="w-4 h-4" />
               Exportar
             </Button>
-            <Button size="sm" className="gap-1.5 h-9 bg-primary hover:bg-primary/90">
+            <Button 
+              size="sm" 
+              className="gap-1.5 h-9 bg-primary hover:bg-primary/90"
+              onClick={() => setNewLeadOpen(true)}
+            >
               <Plus className="w-4 h-4" />
               Novo Lead
             </Button>
@@ -38,6 +46,9 @@ export default function CRM() {
         {/* Kanban Board */}
         <KanbanBoard />
       </div>
+
+      {/* New Lead Dialog */}
+      <NewLeadDialog open={newLeadOpen} onOpenChange={setNewLeadOpen} />
     </MainLayout>
   );
 }

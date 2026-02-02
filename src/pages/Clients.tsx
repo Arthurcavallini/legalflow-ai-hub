@@ -1,10 +1,14 @@
+import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ClientsTable } from '@/components/clients/ClientsTable';
+import { NewClientDialog } from '@/components/clients/NewClientDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, Filter, Download } from 'lucide-react';
 
 export default function Clients() {
+  const [newClientOpen, setNewClientOpen] = useState(false);
+
   return (
     <MainLayout title="Clientes" subtitle="Base de clientes do escritório">
       <div className="space-y-6">
@@ -28,7 +32,11 @@ export default function Clients() {
               <Download className="w-4 h-4" />
               Exportar
             </Button>
-            <Button size="sm" className="gap-1.5 h-9 bg-primary hover:bg-primary/90">
+            <Button 
+              size="sm" 
+              className="gap-1.5 h-9 bg-primary hover:bg-primary/90"
+              onClick={() => setNewClientOpen(true)}
+            >
               <Plus className="w-4 h-4" />
               Novo Cliente
             </Button>
@@ -38,6 +46,9 @@ export default function Clients() {
         {/* Clients Table */}
         <ClientsTable />
       </div>
+
+      {/* New Client Dialog */}
+      <NewClientDialog open={newClientOpen} onOpenChange={setNewClientOpen} />
     </MainLayout>
   );
 }
