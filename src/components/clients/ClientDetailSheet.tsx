@@ -1,5 +1,5 @@
 import { Client } from '@/types';
-import { mockProcesses, mockPayments, mockTasks, mockTeamMembers } from '@/data/mockData';
+import { mockProcesses, mockPayments, mockTasks, mockTeamMembers, mockContracts, mockServices } from '@/data/mockData';
 import { 
   Phone, 
   Mail, 
@@ -13,9 +13,9 @@ import {
   AlertTriangle,
   Calendar,
   Edit,
-  Trash2,
   MessageSquare,
-  ExternalLink,
+  FileSignature,
+  XCircle,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +38,20 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
   const clientProcesses = mockProcesses.filter(p => p.clientId === client.id);
   const clientPayments = mockPayments.filter(p => p.clientId === client.id);
   const clientTasks = mockTasks.filter(t => t.clientId === client.id);
+  const clientContracts = mockContracts.filter(c => c.clientId === client.id);
+
+  const getServiceName = (serviceId: string) => {
+    const service = mockServices.find(s => s.id === serviceId);
+    return service?.name || 'Serviço não encontrado';
+  };
+
+  const contractStatusConfig = {
+    draft: { label: 'Rascunho', icon: FileText, color: 'bg-muted text-muted-foreground border-border' },
+    pending_signature: { label: 'Aguardando', icon: Clock, color: 'bg-warning/10 text-warning border-warning/20' },
+    active: { label: 'Ativo', icon: CheckCircle2, color: 'bg-success/10 text-success border-success/20' },
+    completed: { label: 'Concluído', icon: CheckCircle2, color: 'bg-primary/10 text-primary border-primary/20' },
+    cancelled: { label: 'Cancelado', icon: XCircle, color: 'bg-destructive/10 text-destructive border-destructive/20' },
+  };
 
   const totalReceived = clientPayments
     .filter(p => p.status === 'paid')
@@ -194,18 +208,22 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
 
           {/* Tabs */}
           <Tabs defaultValue="processes" className="space-y-4">
-            <TabsList className="w-full bg-secondary/50 rounded-xl p-1 h-auto">
-              <TabsTrigger value="processes" className="flex-1 rounded-lg py-2.5 text-sm data-[state=active]:bg-card data-[state=active]:shadow-sm">
-                <FileText className="w-4 h-4 mr-2" />
-                Processos ({clientProcesses.length})
+            <TabsList className="w-full bg-secondary/50 rounded-xl p-1 h-auto grid grid-cols-4">
+              <TabsTrigger value="processes" className="rounded-lg py-2 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+                <FileText className="w-3.5 h-3.5 mr-1.5" />
+                Processos
               </TabsTrigger>
-              <TabsTrigger value="tasks" className="flex-1 rounded-lg py-2.5 text-sm data-[state=active]:bg-card data-[state=active]:shadow-sm">
-                <ListTodo className="w-4 h-4 mr-2" />
-                Tarefas ({clientTasks.length})
+              <TabsTrigger value="contracts" className="rounded-lg py-2 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+                <FileSignature className="w-3.5 h-3.5 mr-1.5" />
+                Contratos
               </TabsTrigger>
-              <TabsTrigger value="payments" className="flex-1 rounded-lg py-2.5 text-sm data-[state=active]:bg-card data-[state=active]:shadow-sm">
-                <DollarSign className="w-4 h-4 mr-2" />
-                Financeiro ({clientPayments.length})
+              <TabsTrigger value="tasks" className="rounded-lg py-2 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+                <ListTodo className="w-3.5 h-3.5 mr-1.5" />
+                Tarefas
+              </TabsTrigger>
+              <TabsTrigger value="payments" className="rounded-lg py-2 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+                <DollarSign className="w-3.5 h-3.5 mr-1.5" />
+                Financeiro
               </TabsTrigger>
             </TabsList>
 
@@ -385,6 +403,47 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                   <DollarSign className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm font-medium">Nenhum pagamento</p>
                   <p className="text-xs text-muted-foreground">Este cliente não possui pagamentos cadastrados</p>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Contracts Tab */}
+            <TabsContent value="contracts" className="space-y-3 mt-4">
+              {clientContracts.length > 0 ? (
+                clientContracts.map((contract) => {
+                  const config = contractStatusConfig[contract.status as keyof typeof contractStatusConfig] || contractStatusConfig.draft;
+                  const StatusIcon = config.icon;
+
+                  return (
+                    <div key={contract.id} className="p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer border border-transparent hover:border-primary/20">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <p className="font-semibold text-foreground">{getServiceName(contract.serviceId)}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Criado em {formatDate(contract.createdAt)}
+                          </p>
+                        </div>
+                        <Badge variant="outline" className={cn("gap-1 text-xs border", config.color)}>
+                          <StatusIcon className="w-3 h-3" />
+                          {config.label}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p className="text-lg font-bold text-foreground">{formatCurrency(contract.value)}</p>
+                        {contract.signedAt && (
+                          <p className="text-xs text-muted-foreground">
+                            Assinado em {formatDate(contract.signedAt)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-12">
+                  <FileSignature className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-sm font-medium">Nenhum contrato</p>
+                  <p className="text-xs text-muted-foreground">Este cliente não possui contratos cadastrados</p>
                 </div>
               )}
             </TabsContent>
