@@ -73,8 +73,7 @@ export function Header({ title, subtitle }: HeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-lg p-0">
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src="/placeholder.svg" alt="Usuário" />
+            <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarFallback className="text-xs font-medium bg-primary text-primary-foreground rounded-lg">
                   DR
                 </AvatarFallback>
