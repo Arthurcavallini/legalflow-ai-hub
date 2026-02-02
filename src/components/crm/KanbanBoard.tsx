@@ -6,7 +6,8 @@ import {
   Phone, 
   Calendar, 
   MoreHorizontal, 
-  MessageSquare, 
+  MessageSquare,
+  UserPlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,9 +17,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LeadDetailSheet } from './LeadDetailSheet';
+import { ConvertLeadToClientDialog } from './ConvertLeadToClientDialog';
 
 const columns = [
   { id: 'new', label: 'Novos', color: 'bg-primary' },
@@ -64,9 +67,10 @@ type ExtendedLead = ReturnType<typeof getExtendedLeadData>;
 interface LeadCardProps {
   lead: Lead;
   onSelect: (lead: ExtendedLead) => void;
+  onConvert: (lead: Lead) => void;
 }
 
-function LeadCard({ lead, onSelect }: LeadCardProps) {
+function LeadCard({ lead, onSelect, onConvert }: LeadCardProps) {
   const urgencyStyles = {
     high: 'border-l-destructive',
     medium: 'border-l-warning',
@@ -82,6 +86,11 @@ function LeadCard({ lead, onSelect }: LeadCardProps) {
   const handleClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('[data-dropdown]')) return;
     onSelect(getExtendedLeadData(lead));
+  };
+
+  const handleConvert = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onConvert(lead);
   };
 
   return (
@@ -114,6 +123,15 @@ function LeadCard({ lead, onSelect }: LeadCardProps) {
             <DropdownMenuItem className="text-sm">Ver detalhes</DropdownMenuItem>
             <DropdownMenuItem className="text-sm">Editar</DropdownMenuItem>
             <DropdownMenuItem className="text-sm">Mover para...</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              className="text-sm text-success focus:text-success"
+              onClick={handleConvert}
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Tornar Cliente
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive text-sm">Arquivar</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -147,9 +165,16 @@ function LeadCard({ lead, onSelect }: LeadCardProps) {
 
 export function KanbanBoard() {
   const [selectedLead, setSelectedLead] = useState<ExtendedLead | null>(null);
+  const [convertLeadOpen, setConvertLeadOpen] = useState(false);
+  const [leadToConvert, setLeadToConvert] = useState<Lead | null>(null);
   
   const getLeadsByStatus = (status: string) =>
     mockLeads.filter((lead) => lead.status === status);
+
+  const handleConvertLead = (lead: Lead) => {
+    setLeadToConvert(lead);
+    setConvertLeadOpen(true);
+  };
 
   return (
     <>
@@ -169,7 +194,12 @@ export function KanbanBoard() {
               </div>
               <div className="space-y-3 flex-1 overflow-y-auto">
                 {leads.map((lead) => (
-                  <LeadCard key={lead.id} lead={lead} onSelect={setSelectedLead} />
+                  <LeadCard 
+                    key={lead.id} 
+                    lead={lead} 
+                    onSelect={setSelectedLead} 
+                    onConvert={handleConvertLead}
+                  />
                 ))}
                 {leads.length === 0 && (
                   <div className="flex items-center justify-center h-32 border-2 border-dashed border-border rounded-lg text-xs text-muted-foreground">
@@ -187,6 +217,13 @@ export function KanbanBoard() {
         lead={selectedLead} 
         open={!!selectedLead} 
         onOpenChange={(open) => !open && setSelectedLead(null)} 
+      />
+
+      {/* Convert Lead to Client Dialog */}
+      <ConvertLeadToClientDialog 
+        open={convertLeadOpen}
+        onOpenChange={setConvertLeadOpen}
+        lead={leadToConvert}
       />
     </>
   );
