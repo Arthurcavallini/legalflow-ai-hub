@@ -19,9 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Bot, User, Phone, Mail, MapPin, CreditCard, FileText } from 'lucide-react';
+import { Bot, User, Phone, Mail, MapPin, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { mockLeads } from '@/data/mockData';
 
 interface NewClientDialogProps {
   open: boolean;
@@ -30,10 +29,6 @@ interface NewClientDialogProps {
 
 export function NewClientDialog({ open, onOpenChange }: NewClientDialogProps) {
   const [aiEnabled, setAiEnabled] = useState(true);
-  const [fromLead, setFromLead] = useState(false);
-
-  // Leads que podem ser convertidos (não fechados ainda)
-  const convertibleLeads = mockLeads.filter(l => l.status !== 'closed' && l.status !== 'lost');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -46,51 +41,6 @@ export function NewClientDialog({ open, onOpenChange }: NewClientDialogProps) {
         </DialogHeader>
 
         <div className="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
-          {/* Convert from Lead */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/50">
-            <div className="flex items-center gap-3">
-              <div className={cn(
-                'p-2 rounded-lg',
-                fromLead ? 'bg-success/10' : 'bg-muted'
-              )}>
-                <FileText className={cn(
-                  'w-4 h-4',
-                  fromLead ? 'text-success' : 'text-muted-foreground'
-                )} />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">Converter de Lead</p>
-                <p className="text-xs text-muted-foreground">
-                  {fromLead ? 'Importar dados de um lead existente' : 'Cadastro manual'}
-                </p>
-              </div>
-            </div>
-            <Switch 
-              checked={fromLead} 
-              onCheckedChange={setFromLead}
-            />
-          </div>
-
-          {fromLead && (
-            <div className="grid gap-2">
-              <Label>Selecionar Lead</Label>
-              <Select>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Escolha um lead para converter" />
-                </SelectTrigger>
-                <SelectContent>
-                  {convertibleLeads.map(lead => (
-                    <SelectItem key={lead.id} value={lead.id}>
-                      <div className="flex items-center gap-2">
-                        <span>{lead.name}</span>
-                        <span className="text-xs text-muted-foreground">· {lead.caseType}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
 
           {/* AI Toggle */}
           <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 border border-border/50">
