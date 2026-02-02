@@ -10,7 +10,7 @@ export function NewClientsCard() {
   thisMonth.setHours(0, 0, 0, 0);
   
   const newClients = mockClients.filter(c => new Date(c.createdAt) >= thisMonth);
-  const closedLeads = mockLeads.filter(l => l.status === 'closed');
+  const closedLeads = mockLeads.filter(l => l.status === 'finished');
   
   // Calculate growth (mock data)
   const lastMonthClients = 3;
