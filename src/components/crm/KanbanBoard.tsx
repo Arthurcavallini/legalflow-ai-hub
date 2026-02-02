@@ -150,14 +150,11 @@ function LeadCard({ lead, onSelect, onConvert }: LeadCardProps) {
       </div>
 
       <div className="flex items-center justify-between pt-3 border-t border-border/50">
-        <div className="flex items-center gap-2">
-          <Progress value={lead.probability} className="w-16 h-1.5" />
-          <span className="text-xs font-bold text-primary">{lead.probability}%</span>
-        </div>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <Calendar className="w-3 h-3" />
           {new Date(lead.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
         </div>
+        <span className="text-xs font-bold text-primary">{lead.probability}%</span>
       </div>
     </div>
   );
