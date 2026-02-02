@@ -99,44 +99,77 @@ export default function Intimacoes() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          <div className="flex gap-2">
-            <div className="relative flex-1 sm:w-72">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="dashboard-card p-4">
+          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
+            {/* Search - Takes more space */}
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Buscar por cliente, processo ou tipo..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8 h-9"
+                className="pl-10 h-11 text-sm bg-secondary/50 border-0"
               />
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              variant={filter === 'all' ? 'default' : 'outline'}
-              size="sm"
-              className="h-9"
-              onClick={() => setFilter('all')}
-            >
-              Todas
-            </Button>
-            <Button 
-              variant={filter === 'pending' ? 'default' : 'outline'}
-              size="sm"
-              className="h-9"
-              onClick={() => setFilter('pending')}
-            >
-              Pendentes
-            </Button>
-            <Button 
-              variant={filter === 'acknowledged' ? 'default' : 'outline'}
-              size="sm"
-              className="h-9"
-              onClick={() => setFilter('acknowledged')}
-            >
-              Analisadas
-            </Button>
+
+            {/* Filter Buttons - Pill style */}
+            <div className="flex gap-2 p-1 rounded-xl bg-secondary/50">
+              <Button 
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-9 px-4 rounded-lg transition-all",
+                  filter === 'all' 
+                    ? "bg-card shadow-sm text-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-transparent"
+                )}
+                onClick={() => setFilter('all')}
+              >
+                Todas
+                <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-[10px] bg-muted">
+                  {mockCourtNotifications.length}
+                </Badge>
+              </Button>
+              <Button 
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-9 px-4 rounded-lg transition-all",
+                  filter === 'pending' 
+                    ? "bg-card shadow-sm text-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-transparent"
+                )}
+                onClick={() => setFilter('pending')}
+              >
+                Pendentes
+                <Badge variant="secondary" className={cn(
+                  "ml-2 h-5 px-1.5 text-[10px]",
+                  filter === 'pending' ? "bg-warning/20 text-warning" : "bg-muted"
+                )}>
+                  {pendingCount}
+                </Badge>
+              </Button>
+              <Button 
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-9 px-4 rounded-lg transition-all",
+                  filter === 'acknowledged' 
+                    ? "bg-card shadow-sm text-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-transparent"
+                )}
+                onClick={() => setFilter('acknowledged')}
+              >
+                Analisadas
+                <Badge variant="secondary" className={cn(
+                  "ml-2 h-5 px-1.5 text-[10px]",
+                  filter === 'acknowledged' ? "bg-success/20 text-success" : "bg-muted"
+                )}>
+                  {acknowledgedCount}
+                </Badge>
+              </Button>
+            </div>
           </div>
         </div>
 
