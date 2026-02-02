@@ -31,6 +31,7 @@ const columns = [
   { id: 'client_questions', label: 'Clientes Dúvidas', color: 'bg-orange-500' },
   { id: 'stopped_responding', label: 'Parou de responder', color: 'bg-destructive' },
   { id: 'finished', label: 'Finalizado', color: 'bg-success' },
+  { id: 'closed_contract', label: 'Fechou Contrato', color: 'bg-emerald-600' },
 ];
 
 // Extended lead data with more info
