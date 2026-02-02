@@ -6,13 +6,12 @@ import {
   FolderKanban,
   Wallet,
   UserCog,
-  FileText,
+  FileSignature,
   Calendar,
   Settings,
   ChevronLeft,
   ChevronRight,
   Scale,
-  Package,
   Gavel,
   Search,
   Sun,
@@ -27,17 +26,31 @@ interface NavItem {
   badge?: number;
 }
 
-const mainNavItems: NavItem[] = [
-  { label: 'Dashboard', icon: LayoutDashboard, path: '/' },
-  { label: 'Intimações', icon: Gavel, path: '/intimacoes', badge: 3 },
-  { label: 'CRM', icon: FolderKanban, path: '/crm' },
-  { label: 'Produção', icon: FolderKanban, path: '/production' },
-  { label: 'Clientes', icon: Users, path: '/clients' },
-  { label: 'Financeiro', icon: Wallet, path: '/financial' },
-  { label: 'Contratos', icon: FileText, path: '/contracts' },
-  { label: 'Serviços', icon: Package, path: '/services' },
-  { label: 'Equipe', icon: UserCog, path: '/team' },
-  { label: 'Calendário', icon: Calendar, path: '/calendar' },
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    title: 'PRINCIPAL',
+    items: [
+      { label: 'Dashboard', icon: LayoutDashboard, path: '/' },
+      { label: 'Intimações', icon: Gavel, path: '/intimacoes', badge: 3 },
+      { label: 'CRM', icon: FolderKanban, path: '/crm' },
+      { label: 'Produção', icon: FolderKanban, path: '/production' },
+    ],
+  },
+  {
+    title: 'GESTÃO',
+    items: [
+      { label: 'Clientes', icon: Users, path: '/clients' },
+      { label: 'Equipe', icon: UserCog, path: '/team' },
+      { label: 'Modelos', icon: FileSignature, path: '/contracts' },
+      { label: 'Calendário', icon: Calendar, path: '/calendar' },
+      { label: 'Financeiro', icon: Wallet, path: '/financial' },
+    ],
+  },
 ];
 
 interface SidebarProps {
@@ -99,48 +112,62 @@ export function Sidebar({ isDark, onToggleTheme, collapsed, onToggleCollapsed }:
         {/* Navigation */}
         <nav className={cn(
           "flex-1 overflow-y-auto",
-          collapsed ? "px-2 py-2 space-y-1" : "px-2 py-1 space-y-0.5"
+          collapsed ? "px-2 py-2" : "px-2 py-1"
         )}>
-          {mainNavItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  'flex items-center rounded-lg text-sm transition-all duration-150 relative',
-                  collapsed 
-                    ? 'justify-center w-10 h-10 mx-auto' 
-                    : 'gap-2.5 px-2.5 py-2',
-                  isActive 
-                    ? 'bg-primary text-primary-foreground font-medium' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary font-normal'
-                )}
-              >
-                <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
-                {!collapsed && (
-                  <>
-                    <span className="flex-1">{item.label}</span>
-                    {item.badge && (
-                      <span className={cn(
-                        "flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold rounded-full",
+          {navGroups.map((group, groupIndex) => (
+            <div key={group.title} className={cn(groupIndex > 0 && "mt-6")}>
+              {/* Group Label */}
+              {!collapsed && (
+                <p className="px-2.5 mb-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wider">
+                  {group.title}
+                </p>
+              )}
+              
+              {/* Group Items */}
+              <div className={cn(collapsed ? "space-y-1" : "space-y-0.5")}>
+                {group.items.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      className={cn(
+                        'flex items-center rounded-lg text-sm transition-all duration-150 relative',
+                        collapsed 
+                          ? 'justify-center w-10 h-10 mx-auto' 
+                          : 'gap-2.5 px-2.5 py-2',
                         isActive 
-                          ? "bg-primary-foreground/20 text-primary-foreground" 
-                          : "bg-primary text-primary-foreground"
-                      )}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-                {collapsed && item.badge && (
-                  <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-[16px] px-0.5 text-[9px] font-bold rounded-full bg-destructive text-destructive-foreground border-2 border-card">
-                    {item.badge}
-                  </span>
-                )}
-              </NavLink>
-            );
-          })}
+                          ? 'bg-primary text-primary-foreground font-medium' 
+                          : 'text-muted-foreground hover:text-foreground hover:bg-secondary font-normal'
+                      )}
+                    >
+                      <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
+                      {!collapsed && (
+                        <>
+                          <span className="flex-1">{item.label}</span>
+                          {item.badge && (
+                            <span className={cn(
+                              "flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold rounded-full",
+                              isActive 
+                                ? "bg-primary-foreground/20 text-primary-foreground" 
+                                : "bg-primary text-primary-foreground"
+                            )}>
+                              {item.badge}
+                            </span>
+                          )}
+                        </>
+                      )}
+                      {collapsed && item.badge && (
+                        <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-[16px] px-0.5 text-[9px] font-bold rounded-full bg-destructive text-destructive-foreground border-2 border-card">
+                          {item.badge}
+                        </span>
+                      )}
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {/* Bottom section */}
