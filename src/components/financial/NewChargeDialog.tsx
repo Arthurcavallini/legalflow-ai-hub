@@ -15,6 +15,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,6 +42,8 @@ import {
   User,
   Package,
   Hash,
+  Check,
+  ChevronsUpDown,
 } from 'lucide-react';
 
 interface NewChargeDialogProps {
@@ -45,12 +60,17 @@ const paymentMethods = [
 
 export function NewChargeDialog({ open, onOpenChange }: NewChargeDialogProps) {
   const [selectedClient, setSelectedClient] = useState<string>('');
+  const [clientSearchOpen, setClientSearchOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<string>('');
   const [selectedMethod, setSelectedMethod] = useState<string>('pix');
   const [quantity, setQuantity] = useState<number>(1);
   const [customValue, setCustomValue] = useState<string>('');
 
   const activeClients = mockClients.filter(c => c.status === 'active');
+
+  const selectedClientData = useMemo(() => {
+    return activeClients.find(c => c.id === selectedClient);
+  }, [selectedClient, activeClients]);
 
   const selectedServiceData = useMemo(() => {
     return mockServices.find(s => s.id === selectedService);
@@ -88,6 +108,7 @@ export function NewChargeDialog({ open, onOpenChange }: NewChargeDialogProps) {
 
   const resetForm = () => {
     setSelectedClient('');
+    setClientSearchOpen(false);
     setSelectedService('');
     setSelectedMethod('pix');
     setQuantity(1);
@@ -110,27 +131,63 @@ export function NewChargeDialog({ open, onOpenChange }: NewChargeDialogProps) {
         </DialogHeader>
 
         <div className="space-y-5 py-4">
-          {/* Client Selection */}
+          {/* Client Selection with Search */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2 text-sm font-medium">
               <User className="w-4 h-4 text-muted-foreground" />
               Cliente
             </Label>
-            <Select value={selectedClient} onValueChange={setSelectedClient}>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Selecione o cliente" />
-              </SelectTrigger>
-              <SelectContent>
-                {activeClients.map((client) => (
-                  <SelectItem key={client.id} value={client.id}>
-                    <div className="flex items-center gap-2">
-                      <span>{client.name}</span>
-                      <span className="text-xs text-muted-foreground">{client.phone}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={clientSearchOpen} onOpenChange={setClientSearchOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={clientSearchOpen}
+                  className="w-full h-10 justify-between font-normal"
+                >
+                  {selectedClientData ? (
+                    <span className="flex items-center gap-2">
+                      <span>{selectedClientData.name}</span>
+                      <span className="text-xs text-muted-foreground">{selectedClientData.phone}</span>
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">Buscar cliente...</span>
+                  )}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Digite o nome do cliente..." />
+                  <CommandList>
+                    <CommandEmpty>Nenhum cliente encontrado.</CommandEmpty>
+                    <CommandGroup>
+                      {activeClients.map((client) => (
+                        <CommandItem
+                          key={client.id}
+                          value={client.name}
+                          onSelect={() => {
+                            setSelectedClient(client.id);
+                            setClientSearchOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedClient === client.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex items-center gap-2">
+                            <span>{client.name}</span>
+                            <span className="text-xs text-muted-foreground">{client.phone}</span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           {/* Service Selection */}
