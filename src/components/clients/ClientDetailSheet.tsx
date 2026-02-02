@@ -25,7 +25,11 @@ import {
   Trash2,
   File,
   Image,
+  Pencil,
+  Check,
+  X,
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -51,11 +55,13 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
   const [newContractOpen, setNewContractOpen] = useState(false);
   const [newTaskOpen, setNewTaskOpen] = useState(false);
   const [newPaymentOpen, setNewPaymentOpen] = useState(false);
-  const [attachments, setAttachments] = useState<{id: string; name: string; size: number; type: string; uploadedAt: Date}[]>([
-    { id: '1', name: 'RG_Roberto.pdf', size: 524288, type: 'pdf', uploadedAt: new Date('2024-01-15') },
-    { id: '2', name: 'Comprovante_Residencia.pdf', size: 312456, type: 'pdf', uploadedAt: new Date('2024-01-14') },
+  const [attachments, setAttachments] = useState<{id: string; name: string; size: number; type: string; uploadedAt: Date; description?: string}[]>([
+    { id: '1', name: 'RG_Roberto.pdf', size: 524288, type: 'pdf', uploadedAt: new Date('2024-01-15'), description: 'Documento de identidade do cliente' },
+    { id: '2', name: 'Comprovante_Residencia.pdf', size: 312456, type: 'pdf', uploadedAt: new Date('2024-01-14'), description: 'Comprovante de endereço atualizado' },
     { id: '3', name: 'Foto_Documento.jpg', size: 1048576, type: 'image', uploadedAt: new Date('2024-01-12') },
   ]);
+  const [editingAttachmentId, setEditingAttachmentId] = useState<string | null>(null);
+  const [tempDescription, setTempDescription] = useState('');
 
   if (!client) return null;
 
@@ -552,13 +558,17 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
+                      const newId = Date.now().toString();
                       setAttachments(prev => [...prev, {
-                        id: Date.now().toString(),
+                        id: newId,
                         name: file.name,
                         size: file.size,
                         type: file.type.includes('image') ? 'image' : 'pdf',
                         uploadedAt: new Date()
                       }]);
+                      // Automatically open edit mode for description
+                      setEditingAttachmentId(newId);
+                      setTempDescription('');
                     }
                   }}
                 />
@@ -573,37 +583,105 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                       return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
                     };
 
+                    const isEditing = editingAttachmentId === attachment.id;
+
+                    const handleSaveDescription = () => {
+                      setAttachments(prev => prev.map(a => 
+                        a.id === attachment.id ? { ...a, description: tempDescription } : a
+                      ));
+                      setEditingAttachmentId(null);
+                      setTempDescription('');
+                    };
+
+                    const handleCancelEdit = () => {
+                      setEditingAttachmentId(null);
+                      setTempDescription('');
+                    };
+
+                    const handleStartEdit = () => {
+                      setEditingAttachmentId(attachment.id);
+                      setTempDescription(attachment.description || '');
+                    };
+
                     return (
-                      <div key={attachment.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-border hover:border-primary/20 transition-colors">
-                        <div className={cn(
-                          "p-2 rounded-lg",
-                          attachment.type === 'image' ? "bg-purple-500/10" : "bg-primary/10"
-                        )}>
-                          {attachment.type === 'image' ? (
-                            <Image className="w-4 h-4 text-purple-500" />
-                          ) : (
-                            <File className="w-4 h-4 text-primary" />
-                          )}
+                      <div key={attachment.id} className="p-3 rounded-xl bg-secondary/30 border border-border hover:border-primary/20 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "p-2 rounded-lg flex-shrink-0",
+                            attachment.type === 'image' ? "bg-purple-500/10" : "bg-primary/10"
+                          )}>
+                            {attachment.type === 'image' ? (
+                              <Image className="w-4 h-4 text-purple-500" />
+                            ) : (
+                              <File className="w-4 h-4 text-primary" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{attachment.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatFileSize(attachment.size)} • {formatDate(attachment.uploadedAt)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-muted-foreground hover:text-primary"
+                              onClick={handleStartEdit}
+                              title="Editar descrição"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                              <Download className="w-4 h-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              onClick={() => setAttachments(prev => prev.filter(a => a.id !== attachment.id))}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{attachment.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatFileSize(attachment.size)} • {formatDate(attachment.uploadedAt)}
+                        
+                        {/* Description section */}
+                        {isEditing ? (
+                          <div className="mt-3 flex items-center gap-2">
+                            <Input
+                              placeholder="Adicionar descrição do arquivo..."
+                              value={tempDescription}
+                              onChange={(e) => setTempDescription(e.target.value)}
+                              className="flex-1 h-8 text-sm"
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveDescription();
+                                if (e.key === 'Escape') handleCancelEdit();
+                              }}
+                            />
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-success hover:text-success hover:bg-success/10"
+                              onClick={handleSaveDescription}
+                            >
+                              <Check className="w-4 h-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              onClick={handleCancelEdit}
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ) : attachment.description ? (
+                          <p className="mt-2 text-xs text-muted-foreground pl-10">
+                            {attachment.description}
                           </p>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                            <Download className="w-4 h-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            onClick={() => setAttachments(prev => prev.filter(a => a.id !== attachment.id))}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
+                        ) : null}
                       </div>
                     );
                   })}
