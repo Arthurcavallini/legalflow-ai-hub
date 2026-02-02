@@ -25,6 +25,7 @@ export const mockLeads: Lead[] = [
     updatedAt: new Date('2024-01-15'),
     lastContactAt: new Date('2024-01-15'),
     notes: 'Demissão sem justa causa, 5 anos na empresa',
+    aiEnabled: true,
     aiClassification: {
       intent: 'Reclamação trabalhista',
       sentiment: 'urgente',
@@ -47,6 +48,7 @@ export const mockLeads: Lead[] = [
     updatedAt: new Date('2024-01-15'),
     lastContactAt: new Date('2024-01-15'),
     notes: 'Aposentadoria por tempo de contribuição',
+    aiEnabled: false,
   },
   {
     id: '3',
@@ -63,6 +65,7 @@ export const mockLeads: Lead[] = [
     updatedAt: new Date('2024-01-14'),
     lastContactAt: new Date('2024-01-14'),
     notes: 'Divórcio consensual, sem filhos',
+    aiEnabled: true,
   },
   {
     id: '4',
@@ -80,6 +83,7 @@ export const mockLeads: Lead[] = [
     updatedAt: new Date('2024-01-15'),
     lastContactAt: new Date('2024-01-15'),
     notes: 'Rescisão indireta, assédio moral comprovado',
+    aiEnabled: false,
   },
   {
     id: '5',
@@ -93,6 +97,7 @@ export const mockLeads: Lead[] = [
     officeId: '1',
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-01-15'),
+    aiEnabled: true,
   },
   {
     id: '6',
@@ -108,6 +113,7 @@ export const mockLeads: Lead[] = [
     createdAt: new Date('2024-01-05'),
     updatedAt: new Date('2024-01-12'),
     notes: 'Contrato assinado - R$ 3.500,00',
+    aiEnabled: true,
   },
   {
     id: '7',
@@ -122,6 +128,7 @@ export const mockLeads: Lead[] = [
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-01-15'),
     notes: 'Indicação do Dr. Roberto - caso urgente',
+    aiEnabled: false,
   },
 ];
 
@@ -138,6 +145,7 @@ export const mockClients: Client[] = [
     createdAt: new Date('2024-01-12'),
     updatedAt: new Date('2024-01-15'),
     leadId: '6',
+    aiEnabled: true,
   },
   {
     id: '2',
@@ -150,6 +158,7 @@ export const mockClients: Client[] = [
     status: 'active',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-14'),
+    aiEnabled: false,
   },
   {
     id: '3',
@@ -161,6 +170,7 @@ export const mockClients: Client[] = [
     status: 'active',
     createdAt: new Date('2023-12-15'),
     updatedAt: new Date('2024-01-10'),
+    aiEnabled: true,
   },
   {
     id: '4',
@@ -173,6 +183,7 @@ export const mockClients: Client[] = [
     status: 'active',
     createdAt: new Date('2024-01-10'),
     updatedAt: new Date('2024-01-15'),
+    aiEnabled: false,
   },
   {
     id: '5',
@@ -184,6 +195,7 @@ export const mockClients: Client[] = [
     status: 'inactive',
     createdAt: new Date('2024-01-14'),
     updatedAt: new Date('2024-01-15'),
+    aiEnabled: true,
   },
 ];
 

@@ -12,8 +12,9 @@ import {
   Target,
   Wallet,
   BarChart3,
+  Bot,
 } from 'lucide-react';
-import { mockDashboardMetrics, mockTasks, mockCourtNotifications, mockTeamMembers, mockPayments } from '@/data/mockData';
+import { mockDashboardMetrics, mockTasks, mockCourtNotifications, mockTeamMembers, mockPayments, mockLeads, mockClients } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -191,6 +192,11 @@ export default function Dashboard() {
 
   const chatsNeedingAttention = 5;
 
+  // Count AI disabled chats (leads + clients with aiEnabled = false)
+  const leadsWithAiDisabled = mockLeads.filter(l => l.aiEnabled === false).length;
+  const clientsWithAiDisabled = mockClients.filter(c => c.aiEnabled === false).length;
+  const totalAiDisabled = leadsWithAiDisabled + clientsWithAiDisabled;
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -241,11 +247,11 @@ export default function Dashboard() {
             variant="primary"
           />
           <MetricCard
-            label="Taxa Conversão"
-            value={`${mockDashboardMetrics.conversionRate}%`}
-            subtitle="Leads → Clientes"
-            icon={Target}
-            variant="success"
+            label="IA Desligada"
+            value={totalAiDisabled}
+            subtitle={`${leadsWithAiDisabled} leads · ${clientsWithAiDisabled} clientes`}
+            icon={Bot}
+            variant={totalAiDisabled > 0 ? 'warning' : 'default'}
           />
         </div>
 
