@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Client } from '@/types';
+import { Client, Process, Task, Payment, Contract } from '@/types';
 import { mockProcesses, mockPayments, mockTasks, mockTeamMembers, mockContracts, mockServices } from '@/data/mockData';
 import { 
   Phone, 
@@ -44,6 +44,10 @@ import { NewContractDialog } from './NewContractDialog';
 import { NewTaskDialog } from './NewTaskDialog';
 import { NewPaymentDialog } from './NewPaymentDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { EditProcessDialog } from './EditProcessDialog';
+import { EditTaskDialog } from './EditTaskDialog';
+import { EditContractDialog } from './EditContractDialog';
+import { EditPaymentDialog } from './EditPaymentDialog';
 import { toast } from 'sonner';
 
 interface ClientDetailSheetProps {
@@ -74,6 +78,12 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
     id: string;
     title: string;
   }>({ open: false, type: null, id: '', title: '' });
+
+  // Edit dialog states
+  const [editProcessDialog, setEditProcessDialog] = useState<{ open: boolean; process: Process | null }>({ open: false, process: null });
+  const [editTaskDialog, setEditTaskDialog] = useState<{ open: boolean; task: Task | null }>({ open: false, task: null });
+  const [editContractDialog, setEditContractDialog] = useState<{ open: boolean; contract: Contract | null }>({ open: false, contract: null });
+  const [editPaymentDialog, setEditPaymentDialog] = useState<{ open: boolean; payment: Payment | null }>({ open: false, payment: null });
 
   // Contact editing state
   const [editingContact, setEditingContact] = useState<{
@@ -400,6 +410,17 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary hover:bg-primary/10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditProcessDialog({ open: true, process });
+                            }}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -483,6 +504,17 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                           } className="text-xs">
                             {task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Média' : 'Baixa'}
                           </Badge>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary hover:bg-primary/10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditTaskDialog({ open: true, task });
+                            }}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -605,6 +637,17 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                             <Button
                               variant="ghost"
                               size="icon"
+                              className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary hover:bg-primary/10"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditPaymentDialog({ open: true, payment });
+                              }}
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -663,6 +706,17 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                             <StatusIcon className="w-3 h-3" />
                             {config.label}
                           </Badge>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary hover:bg-primary/10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditContractDialog({ open: true, contract: contract as Contract });
+                            }}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -889,6 +943,30 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
         title={`Excluir ${deleteDialog.title}?`}
         description={`Tem certeza que deseja excluir este ${deleteDialog.title?.toLowerCase()}? Esta ação não pode ser desfeita.`}
         onConfirm={handleDeleteConfirm}
+      />
+
+      {/* Edit Dialogs */}
+      <EditProcessDialog
+        open={editProcessDialog.open}
+        onOpenChange={(open) => setEditProcessDialog(prev => ({ ...prev, open }))}
+        process={editProcessDialog.process}
+      />
+      <EditTaskDialog
+        open={editTaskDialog.open}
+        onOpenChange={(open) => setEditTaskDialog(prev => ({ ...prev, open }))}
+        task={editTaskDialog.task}
+        clientProcesses={clientProcesses}
+      />
+      <EditContractDialog
+        open={editContractDialog.open}
+        onOpenChange={(open) => setEditContractDialog(prev => ({ ...prev, open }))}
+        contract={editContractDialog.contract}
+      />
+      <EditPaymentDialog
+        open={editPaymentDialog.open}
+        onOpenChange={(open) => setEditPaymentDialog(prev => ({ ...prev, open }))}
+        payment={editPaymentDialog.payment}
+        clientId={clientData.id}
       />
     </Sheet>
   );
