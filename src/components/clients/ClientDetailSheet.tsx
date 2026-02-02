@@ -43,6 +43,8 @@ import { NewProcessDialog } from './NewProcessDialog';
 import { NewContractDialog } from './NewContractDialog';
 import { NewTaskDialog } from './NewTaskDialog';
 import { NewPaymentDialog } from './NewPaymentDialog';
+import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { toast } from 'sonner';
 
 interface ClientDetailSheetProps {
   client: Client | null;
@@ -55,6 +57,8 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
   const [newContractOpen, setNewContractOpen] = useState(false);
   const [newTaskOpen, setNewTaskOpen] = useState(false);
   const [newPaymentOpen, setNewPaymentOpen] = useState(false);
+  
+  // Attachments state
   const [attachments, setAttachments] = useState<{id: string; name: string; size: number; type: string; uploadedAt: Date; description?: string}[]>([
     { id: '1', name: 'RG_Roberto.pdf', size: 524288, type: 'pdf', uploadedAt: new Date('2024-01-15'), description: 'Documento de identidade do cliente' },
     { id: '2', name: 'Comprovante_Residencia.pdf', size: 312456, type: 'pdf', uploadedAt: new Date('2024-01-14'), description: 'Comprovante de endereço atualizado' },
@@ -63,7 +67,27 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
   const [editingAttachmentId, setEditingAttachmentId] = useState<string | null>(null);
   const [tempDescription, setTempDescription] = useState('');
 
+  // Delete confirmation state
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    type: 'process' | 'contract' | 'task' | 'payment' | null;
+    id: string;
+    title: string;
+  }>({ open: false, type: null, id: '', title: '' });
+
+  // Contact editing state
+  const [editingContact, setEditingContact] = useState<{
+    field: 'phone' | 'email' | 'cpf' | 'address' | null;
+    value: string;
+  }>({ field: null, value: '' });
+
+  // Local client data for editing (in real app, this would update the backend)
+  const [localClientData, setLocalClientData] = useState<Partial<Client>>({});
+
   if (!client) return null;
+
+  // Merge local edits with original client data
+  const clientData = { ...client, ...localClientData };
 
   const clientProcesses = mockProcesses.filter(p => p.clientId === client.id);
   const clientPayments = mockPayments.filter(p => p.clientId === client.id);
@@ -117,6 +141,99 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
     completed: { label: 'Concluído', color: 'bg-success/20 text-success' },
   };
 
+  // Handle delete confirmation
+  const handleDeleteConfirm = () => {
+    const { type, id, title } = deleteDialog;
+    // In a real app, this would call an API to delete the item
+    toast.success(`${title} excluído com sucesso!`);
+    setDeleteDialog({ open: false, type: null, id: '', title: '' });
+  };
+
+  // Handle contact field save
+  const handleSaveContact = () => {
+    if (editingContact.field) {
+      setLocalClientData(prev => ({
+        ...prev,
+        [editingContact.field!]: editingContact.value
+      }));
+      toast.success('Informação atualizada!');
+    }
+    setEditingContact({ field: null, value: '' });
+  };
+
+  // Contact field component
+  const ContactField = ({
+    icon: Icon,
+    label,
+    value,
+    field,
+    colSpan = false,
+  }: {
+    icon: React.ElementType;
+    label: string;
+    value: string | undefined;
+    field: 'phone' | 'email' | 'cpf' | 'address';
+    colSpan?: boolean;
+  }) => {
+    const isEditing = editingContact.field === field;
+    const displayValue = value || '';
+
+    if (!value && !isEditing) return null;
+
+    return (
+      <div className={cn("flex items-center gap-3 p-3 rounded-xl bg-secondary/30 group", colSpan && "col-span-2")}>
+        <Icon className="w-4 h-4 text-primary flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs text-muted-foreground">{label}</p>
+          {isEditing ? (
+            <div className="flex items-center gap-2 mt-1">
+              <Input
+                value={editingContact.value}
+                onChange={(e) => setEditingContact(prev => ({ ...prev, value: e.target.value }))}
+                className="h-7 text-sm"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveContact();
+                  if (e.key === 'Escape') setEditingContact({ field: null, value: '' });
+                }}
+              />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 text-success hover:text-success hover:bg-success/10"
+                onClick={handleSaveContact}
+              >
+                <Check className="w-3.5 h-3.5" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                onClick={() => setEditingContact({ field: null, value: '' })}
+              >
+                <X className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <p className={cn("text-sm font-medium truncate", field === 'cpf' && "font-mono")}>
+                {displayValue}
+              </p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-primary"
+                onClick={() => setEditingContact({ field, value: displayValue })}
+              >
+                <Pencil className="w-3 h-3" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl bg-card border-border overflow-y-auto p-0">
@@ -126,27 +243,27 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
             <div className="flex items-start gap-4">
               <Avatar className="h-16 w-16 rounded-2xl">
                 <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-primary font-bold text-xl rounded-2xl">
-                  {client.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  {clientData.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-1">
                   <SheetTitle className="text-xl font-bold text-foreground">
-                    {client.name}
+                    {clientData.name}
                   </SheetTitle>
                   <Badge 
                     variant="outline" 
                     className={cn(
-                      client.status === 'active' 
+                      clientData.status === 'active' 
                         ? "bg-success/20 text-success border-success/30" 
                         : "bg-muted text-muted-foreground"
                     )}
                   >
-                    {client.status === 'active' ? 'Ativo' : 'Inativo'}
+                    {clientData.status === 'active' ? 'Ativo' : 'Inativo'}
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Cliente desde {formatDate(client.createdAt)}
+                  Cliente desde {formatDate(clientData.createdAt)}
                 </p>
               </div>
             </div>
@@ -178,22 +295,22 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
             <div className="flex items-center gap-3">
               <div className={cn(
                 'p-2.5 rounded-xl',
-                client.aiEnabled !== false ? 'bg-primary/10' : 'bg-muted'
+                clientData.aiEnabled !== false ? 'bg-primary/10' : 'bg-muted'
               )}>
                 <Bot className={cn(
                   'w-5 h-5',
-                  client.aiEnabled !== false ? 'text-primary' : 'text-muted-foreground'
+                  clientData.aiEnabled !== false ? 'text-primary' : 'text-muted-foreground'
                 )} />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Atendimento IA</p>
                 <p className="text-xs text-muted-foreground">
-                  {client.aiEnabled !== false ? 'Bot ativo para este cliente' : 'Atendimento manual'}
+                  {clientData.aiEnabled !== false ? 'Bot ativo para este cliente' : 'Atendimento manual'}
                 </p>
               </div>
             </div>
             <Switch 
-              checked={client.aiEnabled !== false} 
+              checked={clientData.aiEnabled !== false} 
               onCheckedChange={() => {}}
             />
           </div>
@@ -217,46 +334,16 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
             </div>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Info - Editable */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Informações de Contato
             </h3>
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30">
-                <Phone className="w-4 h-4 text-primary flex-shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-xs text-muted-foreground">Telefone</p>
-                  <p className="text-sm font-medium truncate">{client.phone}</p>
-                </div>
-              </div>
-              {client.email && (
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30">
-                  <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="text-sm font-medium truncate">{client.email}</p>
-                  </div>
-                </div>
-              )}
-              {client.cpf && (
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30">
-                  <User className="w-4 h-4 text-primary flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">CPF</p>
-                    <p className="text-sm font-medium font-mono">{client.cpf}</p>
-                  </div>
-                </div>
-              )}
-              {client.address && (
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 col-span-2">
-                  <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">Endereço</p>
-                    <p className="text-sm font-medium">{client.address}</p>
-                  </div>
-                </div>
-              )}
+              <ContactField icon={Phone} label="Telefone" value={clientData.phone} field="phone" />
+              <ContactField icon={Mail} label="Email" value={clientData.email} field="email" />
+              <ContactField icon={User} label="CPF" value={clientData.cpf} field="cpf" />
+              <ContactField icon={MapPin} label="Endereço" value={clientData.address} field="address" colSpan />
             </div>
           </div>
 
@@ -300,15 +387,33 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                 clientProcesses.map((process) => {
                   const config = statusConfig[process.status as keyof typeof statusConfig] || statusConfig.intake;
                   return (
-                    <div key={process.id} className="p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer border border-transparent hover:border-primary/20">
+                    <div key={process.id} className="p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors border border-transparent hover:border-primary/20 group">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <p className="font-semibold text-foreground">{process.type}</p>
                           <p className="text-xs text-muted-foreground font-mono mt-1">{process.processNumber}</p>
                         </div>
-                        <Badge className={cn('text-xs', config.color)}>
-                          {config.label}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge className={cn('text-xs', config.color)}>
+                            {config.label}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteDialog({
+                                open: true,
+                                type: 'process',
+                                id: process.id,
+                                title: 'Processo'
+                              });
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{process.description}</p>
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -354,7 +459,7 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                   
                   return (
                     <div key={task.id} className={cn(
-                      "p-4 rounded-xl transition-colors cursor-pointer border border-transparent",
+                      "p-4 rounded-xl transition-colors border border-transparent group",
                       isOverdue ? "bg-destructive/10 hover:border-destructive/30" : 
                       isCompleted ? "bg-success/10 hover:border-success/30" :
                       "bg-secondary/30 hover:bg-secondary/50 hover:border-primary/20"
@@ -371,12 +476,30 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                             {task.title}
                           </p>
                         </div>
-                        <Badge variant={
-                          task.priority === 'high' ? 'destructive' : 
-                          task.priority === 'medium' ? 'default' : 'secondary'
-                        } className="text-xs">
-                          {task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Média' : 'Baixa'}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={
+                            task.priority === 'high' ? 'destructive' : 
+                            task.priority === 'medium' ? 'default' : 'secondary'
+                          } className="text-xs">
+                            {task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Média' : 'Baixa'}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteDialog({
+                                open: true,
+                                type: 'task',
+                                id: task.id,
+                                title: 'Tarefa'
+                              });
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                       {task.description && (
                         <p className="text-sm text-muted-foreground line-clamp-1 mb-2">{task.description}</p>
@@ -436,7 +559,7 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                     
                     return (
                       <div key={payment.id} className={cn(
-                        "p-4 rounded-xl transition-colors cursor-pointer border border-transparent",
+                        "p-4 rounded-xl transition-colors border border-transparent group",
                         isOverdue ? "bg-destructive/10 hover:border-destructive/30" : 
                         isPaid ? "bg-success/10 hover:border-success/30" : 
                         "bg-secondary/30 hover:bg-secondary/50 hover:border-primary/20"
@@ -465,18 +588,36 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                               </div>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <Badge 
-                              variant={isPaid ? "outline" : isOverdue ? "destructive" : "secondary"}
-                              className={cn(
-                                isPaid && "bg-success/20 text-success border-success/30"
+                          <div className="flex items-center gap-2">
+                            <div className="text-right">
+                              <Badge 
+                                variant={isPaid ? "outline" : isOverdue ? "destructive" : "secondary"}
+                                className={cn(
+                                  isPaid && "bg-success/20 text-success border-success/30"
+                                )}
+                              >
+                                {isPaid ? 'Pago' : isOverdue ? 'Atrasado' : 'Pendente'}
+                              </Badge>
+                              {payment.method && (
+                                <p className="text-xs text-muted-foreground mt-1 capitalize">{payment.method}</p>
                               )}
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteDialog({
+                                  open: true,
+                                  type: 'payment',
+                                  id: payment.id,
+                                  title: 'Lançamento'
+                                });
+                              }}
                             >
-                              {isPaid ? 'Pago' : isOverdue ? 'Atrasado' : 'Pendente'}
-                            </Badge>
-                            {payment.method && (
-                              <p className="text-xs text-muted-foreground mt-1 capitalize">{payment.method}</p>
-                            )}
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -509,7 +650,7 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                   const StatusIcon = config.icon;
 
                   return (
-                    <div key={contract.id} className="p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer border border-transparent hover:border-primary/20">
+                    <div key={contract.id} className="p-4 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition-colors border border-transparent hover:border-primary/20 group">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <p className="font-semibold text-foreground">{getServiceName(contract.serviceId)}</p>
@@ -517,10 +658,28 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
                             Criado em {formatDate(contract.createdAt)}
                           </p>
                         </div>
-                        <Badge variant="outline" className={cn("gap-1 text-xs border", config.color)}>
-                          <StatusIcon className="w-3 h-3" />
-                          {config.label}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={cn("gap-1 text-xs border", config.color)}>
+                            <StatusIcon className="w-3 h-3" />
+                            {config.label}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteDialog({
+                                open: true,
+                                type: 'contract',
+                                id: contract.id,
+                                title: 'Contrato'
+                              });
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                       <div className="flex items-center justify-between">
                         <p className="text-lg font-bold text-foreground">{formatCurrency(contract.value)}</p>
@@ -702,25 +861,34 @@ export function ClientDetailSheet({ client, open, onOpenChange }: ClientDetailSh
       <NewProcessDialog 
         open={newProcessOpen} 
         onOpenChange={setNewProcessOpen}
-        clientName={client.name}
+        clientName={clientData.name}
       />
       <NewContractDialog 
         open={newContractOpen} 
         onOpenChange={setNewContractOpen}
-        clientName={client.name}
+        clientName={clientData.name}
       />
       <NewTaskDialog 
         open={newTaskOpen} 
         onOpenChange={setNewTaskOpen}
-        clientName={client.name}
-        clientId={client.id}
+        clientName={clientData.name}
+        clientId={clientData.id}
         clientProcesses={clientProcesses}
       />
       <NewPaymentDialog 
         open={newPaymentOpen} 
         onOpenChange={setNewPaymentOpen}
-        clientName={client.name}
-        clientId={client.id}
+        clientName={clientData.name}
+        clientId={clientData.id}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog(prev => ({ ...prev, open }))}
+        title={`Excluir ${deleteDialog.title}?`}
+        description={`Tem certeza que deseja excluir este ${deleteDialog.title?.toLowerCase()}? Esta ação não pode ser desfeita.`}
+        onConfirm={handleDeleteConfirm}
       />
     </Sheet>
   );
