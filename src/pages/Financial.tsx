@@ -41,6 +41,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useState } from 'react';
+import { NewChargeDialog } from '@/components/financial/NewChargeDialog';
 
 const cashFlowData = [
   { month: 'Jan', entrada: 45000, saida: 28000 },
@@ -67,6 +68,7 @@ const paymentMethodData = [
 export default function Financial() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPeriod, setFilterPeriod] = useState('all');
+  const [newChargeOpen, setNewChargeOpen] = useState(false);
 
   const getClientName = (clientId: string) => {
     const client = mockClients.find((c) => c.id === clientId);
@@ -279,7 +281,11 @@ export default function Financial() {
                   <Download className="w-4 h-4" />
                   Exportar
                 </Button>
-                <Button size="sm" className="gap-2 h-9 bg-primary hover:bg-primary/90">
+                <Button 
+                  size="sm" 
+                  className="gap-2 h-9 bg-primary hover:bg-primary/90"
+                  onClick={() => setNewChargeOpen(true)}
+                >
                   <Plus className="w-4 h-4" />
                   Nova Cobrança
                 </Button>
@@ -358,6 +364,8 @@ export default function Financial() {
           </div>
         </div>
       </div>
+
+      <NewChargeDialog open={newChargeOpen} onOpenChange={setNewChargeOpen} />
     </MainLayout>
   );
 }
