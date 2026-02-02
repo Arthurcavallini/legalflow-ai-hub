@@ -26,10 +26,10 @@ import {
 import { TaskDetailSheet } from '@/components/production/TaskDetailSheet';
 
 const productionColumns = [
-  { id: 'pending', label: 'Pendentes', icon: Clock, color: 'text-primary' },
+  { id: 'pending', label: 'Aguardando Início', icon: Clock, color: 'text-primary' },
   { id: 'in_progress', label: 'Em Andamento', icon: Calendar, color: 'text-warning' },
+  { id: 'overdue', label: 'Atrasado', icon: AlertTriangle, color: 'text-destructive' },
   { id: 'completed', label: 'Concluídas', icon: CheckCircle2, color: 'text-success' },
-  { id: 'overdue', label: 'Atrasadas', icon: AlertTriangle, color: 'text-destructive' },
 ];
 
 interface TaskCardProps {
