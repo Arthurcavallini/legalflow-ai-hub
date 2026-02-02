@@ -89,9 +89,9 @@ export default function CalendarPage() {
   const today = new Date();
 
   const eventTypeConfig = {
-    hearing: { label: 'Audiência', color: 'bg-destructive', textColor: 'text-destructive', bgLight: 'bg-destructive/10', icon: AlertCircle },
-    deadline: { label: 'Prazo', color: 'bg-warning', textColor: 'text-warning', bgLight: 'bg-warning/10', icon: Clock },
-    meeting: { label: 'Reunião', color: 'bg-primary', textColor: 'text-primary', bgLight: 'bg-primary/10', icon: Video },
+    hearing: { label: 'Audiência', color: 'bg-destructive', textColor: 'text-destructive/80', bgLight: 'bg-destructive/8', icon: AlertCircle },
+    deadline: { label: 'Prazo', color: 'bg-warning', textColor: 'text-warning/80', bgLight: 'bg-warning/8', icon: Clock },
+    meeting: { label: 'Reunião', color: 'bg-primary', textColor: 'text-primary/80', bgLight: 'bg-primary/8', icon: Video },
   };
 
   const upcomingEvents = mockCalendarEvents
@@ -116,20 +116,20 @@ export default function CalendarPage() {
         {/* Stats Row */}
         <div className="grid gap-4 md:grid-cols-4">
           <div className="dashboard-card">
-            <span className="text-sm text-muted-foreground">Eventos este mês</span>
-            <p className="text-2xl font-bold mt-1">{thisMonthEvents.length}</p>
+            <span className="text-xs text-muted-foreground">Eventos este mês</span>
+            <p className="text-2xl font-semibold mt-1">{thisMonthEvents.length}</p>
           </div>
           <div className="dashboard-card">
-            <span className="text-sm text-muted-foreground">Audiências</span>
-            <p className="text-2xl font-bold mt-1 text-destructive">{hearingsCount}</p>
+            <span className="text-xs text-muted-foreground">Audiências</span>
+            <p className="text-2xl font-semibold mt-1 text-destructive/80">{hearingsCount}</p>
           </div>
           <div className="dashboard-card">
-            <span className="text-sm text-muted-foreground">Prazos</span>
-            <p className="text-2xl font-bold mt-1 text-warning">{deadlinesCount}</p>
+            <span className="text-xs text-muted-foreground">Prazos</span>
+            <p className="text-2xl font-semibold mt-1 text-warning/80">{deadlinesCount}</p>
           </div>
           <div className="dashboard-card">
-            <span className="text-sm text-muted-foreground">Reuniões</span>
-            <p className="text-2xl font-bold mt-1 text-primary">{meetingsCount}</p>
+            <span className="text-xs text-muted-foreground">Reuniões</span>
+            <p className="text-2xl font-semibold mt-1 text-primary/80">{meetingsCount}</p>
           </div>
         </div>
 
@@ -139,7 +139,7 @@ export default function CalendarPage() {
           <div className="dashboard-card">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <h2 className="text-lg font-bold text-foreground">
+                <h2 className="text-lg font-semibold text-foreground">
                   {months[currentDate.getMonth()]} {currentDate.getFullYear()}
                 </h2>
                 <Button variant="outline" size="sm" onClick={goToToday} className="h-8 text-xs">
@@ -264,13 +264,13 @@ export default function CalendarPage() {
                       <>
                         <div className="flex items-center justify-between mb-1">
                           <p className={cn(
-                            'text-sm font-medium',
-                            isToday ? 'text-primary' : 'text-foreground'
+                            'text-sm',
+                            isToday ? 'text-primary font-medium' : 'text-foreground/80'
                           )}>
                             {day.getDate()}
                           </p>
                           {events.length > 0 && (
-                            <span className="flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full bg-primary text-primary-foreground">
+                             <span className="flex items-center justify-center w-5 h-5 text-[10px] font-medium rounded-full bg-primary/80 text-primary-foreground">
                               {events.length}
                             </span>
                           )}
@@ -307,7 +307,7 @@ export default function CalendarPage() {
             {/* Selected Date Events - Below Calendar */}
             {selectedDate && selectedDateEvents.length > 0 && (
               <div className="mt-6 pt-6 border-t border-border">
-                <h3 className="font-semibold text-sm text-foreground mb-4">
+                <h3 className="font-medium text-sm text-foreground/90 mb-4">
                   {selectedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </h3>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -331,7 +331,7 @@ export default function CalendarPage() {
                             {config.label}
                           </Badge>
                         </div>
-                        <p className="font-medium text-sm">{event.title}</p>
+                        <p className="font-normal text-sm text-foreground/90">{event.title}</p>
                         {clientName && (
                           <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                             <User className="w-3 h-3" />
@@ -352,7 +352,7 @@ export default function CalendarPage() {
 
           {/* Upcoming Events - Sidebar */}
           <div className="dashboard-card h-fit lg:sticky lg:top-6">
-            <h3 className="font-semibold text-sm text-foreground mb-4">Próximos Eventos</h3>
+            <h3 className="font-medium text-sm text-foreground/90 mb-4">Próximos Eventos</h3>
             <div className="space-y-3">
               {upcomingEvents.map(event => {
                 const config = eventTypeConfig[event.type as keyof typeof eventTypeConfig];
@@ -369,7 +369,7 @@ export default function CalendarPage() {
                         <EventIcon className={cn('w-4 h-4', config.textColor)} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{event.title}</p>
+                        <p className="font-normal text-sm text-foreground/90 truncate">{event.title}</p>
                         <div className="flex flex-col gap-1 mt-1.5 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1.5">
                             <CalendarIcon className="w-3 h-3" />
