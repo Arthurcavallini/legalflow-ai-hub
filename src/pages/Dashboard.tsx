@@ -463,29 +463,24 @@ export default function Dashboard() {
                     <div 
                       key={notification.id} 
                       className={cn(
-                        'p-4 rounded-xl border transition-colors cursor-pointer',
+                        'flex items-center gap-4 p-4 rounded-xl border transition-colors cursor-pointer',
                         isUrgent 
                           ? 'bg-warning/5 border-warning/20 hover:bg-warning/10' 
                           : 'bg-secondary/30 border-border/50 hover:bg-secondary/50'
                       )}
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{notification.type}</p>
-                          <p className="text-xs text-muted-foreground">{notification.clientName}</p>
-                        </div>
-                        <span className={cn(
-                          'text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0',
-                          isUrgent 
-                            ? 'bg-warning/15 text-warning' 
-                            : 'bg-muted text-muted-foreground'
-                        )}>
-                          {daysUntil} dias
-                        </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{notification.type}</p>
+                        <p className="text-xs text-muted-foreground truncate">{notification.clientName} · {notification.processNumber}</p>
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-1">
-                        Processo: {notification.processNumber}
-                      </p>
+                      <span className={cn(
+                        'text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0',
+                        isUrgent 
+                          ? 'bg-warning/15 text-warning' 
+                          : 'bg-muted text-muted-foreground'
+                      )}>
+                        {daysUntil} dias
+                      </span>
                     </div>
                   );
                 })
